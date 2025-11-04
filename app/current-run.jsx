@@ -20,6 +20,7 @@ export default function CurrentRunScreen() {
     startTracking,
     pauseTracking,
     finishRun,
+    resetRun,
     hasPermission,
   } = useLocationTracking();
 
@@ -43,7 +44,7 @@ export default function CurrentRunScreen() {
 
   const handlePlayPause = () => {
     if (!hasPermission) {
-      Alert.alert('Permission Required', 'Please enable location permissions to track your run.');
+      Alert.alert('Permissão Necessária', 'Por favor, habilite as permissões de localização para rastrear sua corrida.');
       return;
     }
     
@@ -54,22 +55,45 @@ export default function CurrentRunScreen() {
     }
   };
 
+  const handleStop = () => {
+    // If tracking or has data, show confirmation
+    if (isTracking || time > 0 || distance > 0) {
+      Alert.alert(
+        'Zerar Corrida',
+        'Tem certeza que deseja zerar o cronômetro e perder todos os dados desta corrida?',
+        [
+          { text: 'Cancelar', style: 'cancel' },
+          {
+            text: 'Zerar',
+            style: 'destructive',
+            onPress: () => {
+              resetRun();
+            },
+          },
+        ]
+      );
+    } else {
+      // If no tracking or data, just go back
+      router.back();
+    }
+  };
+
   const handleFinish = async () => {
     // Allow finishing if there's at least some time tracked
     if (time === 0) {
-      Alert.alert('No Run Data', 'Please start a run before finishing.');
+      Alert.alert('Sem Dados de Corrida', 'Por favor, inicie uma corrida antes de finalizar.');
       return;
     }
 
     // Warn if distance is 0 (common in emulator) but still allow saving
     if (distance === 0) {
       Alert.alert(
-        'No Distance Recorded',
-        'No distance was tracked. This is common when testing on an emulator.\n\nDo you want to save this run anyway?',
+        'Nenhuma Distância Registrada',
+        'Nenhuma distância foi rastreada. Isso é comum ao testar em um emulador.\n\nDeseja salvar esta corrida mesmo assim?',
         [
-          { text: 'Cancel', style: 'cancel' },
+          { text: 'Cancelar', style: 'cancel' },
           {
-            text: 'Save',
+            text: 'Salvar',
             onPress: async () => {
               await finishRun();
               router.back();
@@ -81,12 +105,12 @@ export default function CurrentRunScreen() {
     }
 
     Alert.alert(
-      'Finish Run',
-      `Save this run?\nDistance: ${distance.toFixed(2)} km\nTime: ${formatTime(time)}`,
+      'Finalizar Corrida',
+      `Salvar esta corrida?\nDistância: ${distance.toFixed(2)} km\nTempo: ${formatTime(time)}`,
       [
-        { text: 'Cancel', style: 'cancel' },
+        { text: 'Cancelar', style: 'cancel' },
         {
-          text: 'Save',
+          text: 'Salvar',
           onPress: async () => {
             await finishRun();
             router.back();
@@ -106,7 +130,7 @@ export default function CurrentRunScreen() {
           <IconSymbol name="chevron.left" size={24} color={isDark ? '#E5E1E6' : '#1B1B1F'} />
         </TouchableOpacity>
         <Text className={`text-lg font-psemibold ${isDark ? 'text-white' : 'text-black'}`}>
-          Running
+          Correndo
         </Text>
         <View className="w-10" />
       </View>
@@ -124,12 +148,12 @@ export default function CurrentRunScreen() {
       </View>
 
       {/* Stats Card */}
-      <View className={`mx-6 mb-8 rounded-3xl p-6 ${isDark ? 'bg-gray-200' : 'bg-white'} shadow-lg`}>
+      <View className={`mx-6 mb-8 rounded-3xl p-6 border ${isDark ? 'bg-gray-200 border-gray-300/30' : 'bg-white border-gray-300'} shadow-lg`}>
         {/* Main Stats */}
         <View className="flex-row justify-around mb-6">
           <View className="items-center">
             <Text className={`text-xs mb-2 ${isDark ? 'text-gray-100' : 'text-gray-400'}`}>
-              DISTANCE
+              DISTÂNCIA
             </Text>
             <Text className={`text-3xl font-pbold ${isDark ? 'text-white' : 'text-black'}`}>
               {distance.toFixed(2)} km
@@ -139,7 +163,7 @@ export default function CurrentRunScreen() {
             <View className="flex-row items-center mb-2">
               <Ionicons name="time" size={16} color={isDark ? '#918F9A' : '#777680'} />
               <Text className={`text-xs ml-1 ${isDark ? 'text-gray-100' : 'text-gray-400'}`}>
-                TIME
+                TEMPO
               </Text>
             </View>
             <Text className={`text-3xl font-pbold ${isDark ? 'text-white' : 'text-black'}`}>
@@ -148,7 +172,7 @@ export default function CurrentRunScreen() {
           </View>
           <View className="items-center">
             <Text className={`text-xs mb-2 ${isDark ? 'text-gray-100' : 'text-gray-400'}`}>
-              PACE
+              RITMO
             </Text>
             <Text className={`text-3xl font-pbold ${isDark ? 'text-white' : 'text-black'}`}>
               {formatPace()}
@@ -159,9 +183,9 @@ export default function CurrentRunScreen() {
         {/* Control Buttons */}
         <View className="flex-row justify-center gap-4">
           <TouchableOpacity
-            className={`w-16 h-16 rounded-full items-center justify-center ${isDark ? 'bg-black-200' : 'bg-gray-100'}`}
-            onPress={() => router.back()}>
-            <IconSymbol name="stop.fill" size={24} color={isDark ? '#E5E1E6' : '#1B1B1F'} />
+            className={`w-16 h-16 rounded-full items-center justify-center border-2 ${isDark ? 'bg-red-500/30 border-red-500' : 'bg-red-500/40 border-red-500'}`}
+            onPress={handleStop}>
+            <Ionicons name="stop" size={24} color={isDark ? '#DC2626' : '#B91C1C'} />
           </TouchableOpacity>
           
           <TouchableOpacity
@@ -175,9 +199,9 @@ export default function CurrentRunScreen() {
           </TouchableOpacity>
           
           <TouchableOpacity
-            className={`w-16 h-16 rounded-full items-center justify-center ${isDark ? 'bg-secondary/20' : 'bg-secondary/20'}`}
+            className={`w-16 h-16 rounded-full items-center justify-center border-2 ${isDark ? 'bg-secondary/30 border-secondary' : 'bg-secondary/40 border-secondary'}`}
             onPress={handleFinish}>
-            <IconSymbol name="flag.fill" size={24} color="#33A853" />
+            <Ionicons name="flag" size={24} color={isDark ? '#33A853' : '#1B8652'} />
           </TouchableOpacity>
         </View>
       </View>

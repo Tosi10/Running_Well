@@ -7,6 +7,7 @@ import '../global.css';
 
 import { RunProvider } from '@/context/RunContext';
 import { SettingsProvider } from '@/context/SettingsContext';
+import { AchievementsProvider } from '@/context/AchievementsContext';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 
 export const unstable_settings = {
@@ -20,16 +21,20 @@ export default function RootLayout() {
     <SafeAreaProvider>
       <SettingsProvider>
         <RunProvider>
-          <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-              <Stack>
-                <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-                <Stack.Screen name="current-run" options={{ headerShown: false, presentation: 'fullScreenModal' }} />
-                <Stack.Screen name="personal-parameters" options={{ headerShown: false, presentation: 'modal' }} />
-                <Stack.Screen name="run-details" options={{ headerShown: false, presentation: 'card' }} />
-                <Stack.Screen name="modal" options={{ presentation: 'modal', title: 'Modal' }} />
-              </Stack>
-            <StatusBar style="auto" />
-          </ThemeProvider>
+          <AchievementsProvider>
+            <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
+                <Stack>
+                  <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+                  <Stack.Screen name="current-run" options={{ headerShown: false, presentation: 'fullScreenModal' }} />
+                  <Stack.Screen name="personal-parameters" options={{ headerShown: false, presentation: 'modal' }} />
+                  <Stack.Screen name="goal-settings" options={{ headerShown: false, presentation: 'modal' }} />
+                  <Stack.Screen name="run-details" options={{ headerShown: false, presentation: 'card' }} />
+                  <Stack.Screen name="achievements" options={{ headerShown: false, presentation: 'modal' }} />
+                  <Stack.Screen name="modal" options={{ presentation: 'modal', title: 'Modal' }} />
+                </Stack>
+              <StatusBar style="auto" />
+            </ThemeProvider>
+          </AchievementsProvider>
         </RunProvider>
       </SettingsProvider>
     </SafeAreaProvider>

@@ -4,7 +4,7 @@
     "slug": "running-well",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/images/icon.png",
+    "icon": "./assets/images/running-well1.png",
     "scheme": "runningwell",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
@@ -23,9 +23,9 @@
     "android": {
       "adaptiveIcon": {
         "backgroundColor": "#E6F4FE",
-        "foregroundImage": "./assets/images/android-icon-foreground.png",
+        "foregroundImage": "./assets/images/running-well1.png",
         "backgroundImage": "./assets/images/android-icon-background.png",
-        "monochromeImage": "./assets/images/android-icon-monochrome.png"
+        "monochromeImage": "./assets/images/running-well1.png"
       },
       "config": {
         "googleMaps": {
@@ -43,7 +43,7 @@
     },
     "web": {
       "output": "static",
-      "favicon": "./assets/images/favicon.png"
+      "favicon": "./assets/images/running-well1.png"
     },
     "plugins": [
       "expo-router",
@@ -58,7 +58,7 @@
       [
         "expo-splash-screen",
         {
-          "image": "./assets/images/splash-icon.png",
+          "image": "./assets/images/running-well1.png",
           "imageWidth": 200,
           "resizeMode": "contain",
           "backgroundColor": "#ffffff",

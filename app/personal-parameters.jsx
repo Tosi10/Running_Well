@@ -21,7 +21,7 @@ export default function PersonalParametersScreen() {
 
   const handleSave = () => {
     const updates = {
-      userName: formData.userName || 'User Name',
+      userName: formData.userName || 'Nome do Usuário',
       weight: parseFloat(formData.weight) || settings.weight,
       height: parseFloat(formData.height) || settings.height,
       age: parseInt(formData.age) || settings.age,
@@ -29,7 +29,7 @@ export default function PersonalParametersScreen() {
     };
 
     updateSettings(updates);
-    Alert.alert('Success', 'Personal parameters saved!', [
+    Alert.alert('Sucesso', 'Parâmetros pessoais salvos!', [
       { text: 'OK', onPress: () => router.back() },
     ]);
   };
@@ -45,22 +45,22 @@ export default function PersonalParametersScreen() {
             <IconSymbol name="chevron.left" size={24} color={isDark ? '#E5E1E6' : '#1B1B1F'} />
           </TouchableOpacity>
           <Text className={`text-2xl font-pbold ${isDark ? 'text-white' : 'text-black'}`}>
-            Personal Parameters
+            Parâmetros Pessoais
           </Text>
         </View>
 
         {/* Form */}
-        <View className={`rounded-2xl p-6 mb-4 ${isDark ? 'bg-gray-200' : 'bg-gray-100'}`}>
+        <View className={`rounded-2xl p-6 mb-4 border ${isDark ? 'bg-gray-200 border-gray-300/30' : 'bg-gray-100 border-gray-300'}`}>
           {/* User Name */}
           <View className="mb-6">
             <Text className={`text-sm font-psemibold mb-2 ${isDark ? 'text-gray-100' : 'text-gray-400'}`}>
-              Name
+              Nome
             </Text>
             <TextInput
               className={`rounded-xl px-4 py-3 ${isDark ? 'bg-black-200 text-white' : 'bg-white text-black'}`}
               value={formData.userName}
               onChangeText={(text) => setFormData({ ...formData, userName: text })}
-              placeholder="Enter your name"
+              placeholder="Digite seu nome"
               placeholderTextColor={isDark ? '#918F9A' : '#777680'}
             />
           </View>
@@ -68,13 +68,13 @@ export default function PersonalParametersScreen() {
           {/* Weight */}
           <View className="mb-6">
             <Text className={`text-sm font-psemibold mb-2 ${isDark ? 'text-gray-100' : 'text-gray-400'}`}>
-              Weight (kg)
+              Peso (kg)
             </Text>
             <TextInput
               className={`rounded-xl px-4 py-3 ${isDark ? 'bg-black-200 text-white' : 'bg-white text-black'}`}
               value={formData.weight}
               onChangeText={(text) => setFormData({ ...formData, weight: text })}
-              placeholder="Enter your weight"
+              placeholder="Digite seu peso"
               placeholderTextColor={isDark ? '#918F9A' : '#777680'}
               keyboardType="numeric"
             />
@@ -83,13 +83,13 @@ export default function PersonalParametersScreen() {
           {/* Height */}
           <View className="mb-6">
             <Text className={`text-sm font-psemibold mb-2 ${isDark ? 'text-gray-100' : 'text-gray-400'}`}>
-              Height (cm)
+              Altura (cm)
             </Text>
             <TextInput
               className={`rounded-xl px-4 py-3 ${isDark ? 'bg-black-200 text-white' : 'bg-white text-black'}`}
               value={formData.height}
               onChangeText={(text) => setFormData({ ...formData, height: text })}
-              placeholder="Enter your height"
+              placeholder="Digite sua altura"
               placeholderTextColor={isDark ? '#918F9A' : '#777680'}
               keyboardType="numeric"
             />
@@ -98,13 +98,13 @@ export default function PersonalParametersScreen() {
           {/* Age */}
           <View className="mb-6">
             <Text className={`text-sm font-psemibold mb-2 ${isDark ? 'text-gray-100' : 'text-gray-400'}`}>
-              Age
+              Idade
             </Text>
             <TextInput
               className={`rounded-xl px-4 py-3 ${isDark ? 'bg-black-200 text-white' : 'bg-white text-black'}`}
               value={formData.age}
               onChangeText={(text) => setFormData({ ...formData, age: text })}
-              placeholder="Enter your age"
+              placeholder="Digite sua idade"
               placeholderTextColor={isDark ? '#918F9A' : '#777680'}
               keyboardType="numeric"
             />
@@ -113,10 +113,10 @@ export default function PersonalParametersScreen() {
           {/* Gender */}
           <View className="mb-6">
             <Text className={`text-sm font-psemibold mb-2 ${isDark ? 'text-gray-100' : 'text-gray-400'}`}>
-              Gender
+              Gênero
             </Text>
             <View className="flex-row gap-3">
-              {['male', 'female', 'other'].map((gender) => (
+              {['male', 'female'].map((gender) => (
                 <TouchableOpacity
                   key={gender}
                   className={`flex-1 rounded-xl py-3 items-center ${
@@ -133,7 +133,7 @@ export default function PersonalParametersScreen() {
                     className={`font-pregular ${
                       formData.gender === gender ? 'text-white' : isDark ? 'text-gray-100' : 'text-black'
                     }`}>
-                    {gender.charAt(0).toUpperCase() + gender.slice(1)}
+                    {gender === 'male' ? 'Masculino' : 'Feminino'}
                   </Text>
                 </TouchableOpacity>
               ))}
@@ -145,7 +145,7 @@ export default function PersonalParametersScreen() {
         <TouchableOpacity
           className={`rounded-2xl py-4 items-center ${isDark ? 'bg-primary-200' : 'bg-primary'}`}
           onPress={handleSave}>
-          <Text className="text-white text-base font-psemibold">Save</Text>
+          <Text className="text-white text-base font-psemibold">Salvar</Text>
         </TouchableOpacity>
       </View>
     </ScrollView>

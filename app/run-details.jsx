@@ -18,11 +18,11 @@ export default function RunDetailsScreen() {
   if (!run) {
     return (
       <View className={`flex-1 ${isDark ? 'bg-background-dark' : 'bg-background-light'} items-center justify-center`}>
-        <Text className={`text-lg ${isDark ? 'text-white' : 'text-black'}`}>Run not found</Text>
+        <Text className={`text-lg ${isDark ? 'text-white' : 'text-black'}`}>Corrida não encontrada</Text>
         <TouchableOpacity 
           className={`mt-4 px-6 py-3 rounded-full ${isDark ? 'bg-primary-200' : 'bg-primary'}`}
           onPress={() => router.back()}>
-          <Text className="text-white font-pbold">Go Back</Text>
+          <Text className="text-white font-pbold">Voltar</Text>
         </TouchableOpacity>
       </View>
     );
@@ -50,7 +50,7 @@ export default function RunDetailsScreen() {
 
   const formatDate = () => {
     const date = new Date(run.timestamp);
-    return date.toLocaleDateString('en-US', {
+    return date.toLocaleDateString('pt-BR', {
       weekday: 'long',
       year: 'numeric',
       month: 'long',
@@ -60,7 +60,7 @@ export default function RunDetailsScreen() {
 
   const formatTimeOfDay = () => {
     const date = new Date(run.timestamp);
-    return date.toLocaleTimeString('en-US', {
+    return date.toLocaleTimeString('pt-BR', {
       hour: '2-digit',
       minute: '2-digit',
     });
@@ -81,7 +81,7 @@ export default function RunDetailsScreen() {
           <IconSymbol name="chevron.left" size={24} color={isDark ? '#E5E1E6' : '#1B1B1F'} />
         </TouchableOpacity>
         <Text className={`text-lg font-psemibold ${isDark ? 'text-white' : 'text-black'}`}>
-          Run Details
+          Detalhes da Corrida
         </Text>
         <TouchableOpacity
           onPress={handleDelete}
@@ -101,11 +101,11 @@ export default function RunDetailsScreen() {
       {/* Stats Cards */}
       <View className="px-6 mb-6">
         <View className="flex-row gap-4 mb-4">
-          <View className={`flex-1 rounded-2xl p-4 ${isDark ? 'bg-gray-200' : 'bg-gray-100'}`}>
+          <View className={`flex-1 rounded-2xl p-4 border ${isDark ? 'bg-gray-200 border-gray-300/30' : 'bg-gray-100 border-gray-300'}`}>
             <View className="flex-row items-center mb-2">
               <Ionicons name="flame" size={16} color={isDark ? '#918F9A' : '#777680'} />
               <Text className={`text-xs ml-2 ${isDark ? 'text-gray-100' : 'text-gray-400'}`}>
-                DISTANCE
+                DISTÂNCIA
               </Text>
             </View>
             <Text className={`text-2xl font-pbold ${isDark ? 'text-white' : 'text-black'}`}>
@@ -113,11 +113,11 @@ export default function RunDetailsScreen() {
             </Text>
           </View>
           
-          <View className={`flex-1 rounded-2xl p-4 ${isDark ? 'bg-gray-200' : 'bg-gray-100'}`}>
+          <View className={`flex-1 rounded-2xl p-4 border ${isDark ? 'bg-gray-200 border-gray-300/30' : 'bg-gray-100 border-gray-300'}`}>
             <View className="flex-row items-center mb-2">
               <Ionicons name="time" size={16} color={isDark ? '#918F9A' : '#777680'} />
               <Text className={`text-xs ml-2 ${isDark ? 'text-gray-100' : 'text-gray-400'}`}>
-                TIME
+                TEMPO
               </Text>
             </View>
             <Text className={`text-2xl font-pbold ${isDark ? 'text-white' : 'text-black'}`}>
@@ -127,26 +127,26 @@ export default function RunDetailsScreen() {
         </View>
 
         <View className="flex-row gap-4">
-          <View className={`flex-1 rounded-2xl p-4 ${isDark ? 'bg-gray-200' : 'bg-gray-100'}`}>
+          <View className={`flex-1 rounded-2xl p-4 border ${isDark ? 'bg-gray-200 border-gray-300/30' : 'bg-gray-100 border-gray-300'}`}>
             <View className="flex-row items-center mb-2">
               <Ionicons name="speedometer" size={16} color={isDark ? '#918F9A' : '#777680'} />
               <Text className={`text-xs ml-2 ${isDark ? 'text-gray-100' : 'text-gray-400'}`}>
-                PACE
+                RITMO
               </Text>
             </View>
             <Text className={`text-2xl font-pbold ${isDark ? 'text-white' : 'text-black'}`}>
               {formatPace()}
             </Text>
-            <Text className={`text-xs mt-1 ${isDark ? 'text-gray-100' : 'text-gray-400'}`}>
-              per km
-            </Text>
+              <Text className={`text-xs mt-1 ${isDark ? 'text-gray-100' : 'text-gray-400'}`}>
+                por km
+              </Text>
           </View>
           
-          <View className={`flex-1 rounded-2xl p-4 ${isDark ? 'bg-gray-200' : 'bg-gray-100'}`}>
+          <View className={`flex-1 rounded-2xl p-4 border ${isDark ? 'bg-gray-200 border-gray-300/30' : 'bg-gray-100 border-gray-300'}`}>
             <View className="flex-row items-center mb-2">
               <Ionicons name="flash" size={16} color={isDark ? '#918F9A' : '#777680'} />
               <Text className={`text-xs ml-2 ${isDark ? 'text-gray-100' : 'text-gray-400'}`}>
-                AVG SPEED
+                VELOCIDADE MÉDIA
               </Text>
             </View>
             <Text className={`text-2xl font-pbold ${isDark ? 'text-white' : 'text-black'}`}>
@@ -157,11 +157,11 @@ export default function RunDetailsScreen() {
       </View>
 
       {/* Date & Time Info */}
-      <View className={`mx-6 mb-6 rounded-2xl p-4 ${isDark ? 'bg-gray-200' : 'bg-gray-100'}`}>
+      <View className={`mx-6 mb-6 rounded-2xl p-4 border ${isDark ? 'bg-gray-200 border-gray-300/30' : 'bg-gray-100 border-gray-300'}`}>
         <View className="flex-row items-center mb-2">
           <Ionicons name="calendar" size={16} color={isDark ? '#918F9A' : '#777680'} />
           <Text className={`text-sm font-psemibold ml-2 ${isDark ? 'text-white' : 'text-black'}`}>
-            Date & Time
+            Data e Hora
           </Text>
         </View>
         <Text className={`text-base mt-1 ${isDark ? 'text-gray-100' : 'text-gray-400'}`}>

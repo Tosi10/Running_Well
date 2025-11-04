@@ -26,20 +26,20 @@ export default function StatsScreen() {
     <ScrollView className={`flex-1 ${isDark ? 'bg-background-dark' : 'bg-background-light'}`}>
       <View className="px-6 pt-16 pb-8">
         <Text className={`text-2xl font-pbold mb-6 ${isDark ? 'text-white' : 'text-black'}`}>
-          Statistics
+          Estatísticas
         </Text>
         
         {/* Weekly Stats Card */}
-        <View className={`rounded-2xl p-6 mb-4 ${isDark ? 'bg-gray-200' : 'bg-gray-100'}`}>
+        <View className={`rounded-2xl p-6 mb-4 border ${isDark ? 'bg-gray-200 border-gray-300/30' : 'bg-gray-100 border-gray-300'}`}>
           <Text className={`text-lg font-psemibold mb-4 ${isDark ? 'text-white' : 'text-black'}`}>
-            This Week
+            Esta Semana
           </Text>
           <View className="flex-row justify-between mb-4">
             <View className="flex-1">
                 <View className="flex-row items-center mb-1">
                   <Ionicons name="flame" size={12} color={isDark ? '#918F9A' : '#777680'} />
                   <Text className={`text-xs ml-1 ${isDark ? 'text-gray-100' : 'text-gray-400'}`}>
-                    Distance
+                    Distância
                   </Text>
                 </View>
               <Text className={`text-xl font-pbold ${isDark ? 'text-white' : 'text-black'}`}>
@@ -50,7 +50,7 @@ export default function StatsScreen() {
                 <View className="flex-row items-center mb-1">
                   <Ionicons name="time" size={12} color={isDark ? '#918F9A' : '#777680'} />
                   <Text className={`text-xs ml-1 ${isDark ? 'text-gray-100' : 'text-gray-400'}`}>
-                    Time
+                    Tempo
                   </Text>
                 </View>
               <Text className={`text-xl font-pbold ${isDark ? 'text-white' : 'text-black'}`}>
@@ -61,7 +61,7 @@ export default function StatsScreen() {
                 <View className="flex-row items-center mb-1">
                   <Ionicons name="flash" size={12} color={isDark ? '#918F9A' : '#777680'} />
                   <Text className={`text-xs ml-1 ${isDark ? 'text-gray-100' : 'text-gray-400'}`}>
-                    Runs
+                    Corridas
                   </Text>
                 </View>
               <Text className={`text-xl font-pbold ${isDark ? 'text-white' : 'text-black'}`}>
@@ -72,9 +72,9 @@ export default function StatsScreen() {
         </View>
 
         {/* All Time Stats */}
-        <View className={`rounded-2xl p-6 ${isDark ? 'bg-gray-200' : 'bg-gray-100'}`}>
+        <View className={`rounded-2xl p-6 border ${isDark ? 'bg-gray-200 border-gray-300/30' : 'bg-gray-100 border-gray-300'}`}>
           <Text className={`text-lg font-psemibold mb-4 ${isDark ? 'text-white' : 'text-black'}`}>
-            All Time
+            Desde o Início
           </Text>
           <View className="space-y-4">
             <View className="flex-row justify-between">
@@ -82,7 +82,7 @@ export default function StatsScreen() {
                 <View className="flex-row items-center mb-1">
                   <Ionicons name="flame" size={12} color={isDark ? '#918F9A' : '#777680'} />
                   <Text className={`text-xs ml-1 ${isDark ? 'text-gray-100' : 'text-gray-400'}`}>
-                    Total Distance
+                    Distância Total
                   </Text>
                 </View>
                 <Text className={`text-2xl font-pbold ${isDark ? 'text-white' : 'text-black'}`}>
@@ -93,7 +93,7 @@ export default function StatsScreen() {
                 <View className="flex-row items-center mb-1">
                   <Ionicons name="time" size={12} color={isDark ? '#918F9A' : '#777680'} />
                   <Text className={`text-xs ml-1 ${isDark ? 'text-gray-100' : 'text-gray-400'}`}>
-                    Total Time
+                    Tempo Total
                   </Text>
                 </View>
                 <Text className={`text-2xl font-pbold ${isDark ? 'text-white' : 'text-black'}`}>
@@ -107,7 +107,7 @@ export default function StatsScreen() {
                 <View className="flex-row items-center mb-1">
                   <Ionicons name="flash" size={12} color={isDark ? '#918F9A' : '#777680'} />
                   <Text className={`text-xs ml-1 ${isDark ? 'text-gray-100' : 'text-gray-400'}`}>
-                    Total Runs
+                    Total de Corridas
                   </Text>
                 </View>
                 <Text className={`text-2xl font-pbold ${isDark ? 'text-white' : 'text-black'}`}>
@@ -118,7 +118,7 @@ export default function StatsScreen() {
                 <View className="flex-row items-center mb-1">
                   <Ionicons name="speedometer" size={12} color={isDark ? '#918F9A' : '#777680'} />
                   <Text className={`text-xs ml-1 ${isDark ? 'text-gray-100' : 'text-gray-400'}`}>
-                    Avg Speed
+                    Velocidade Média
                   </Text>
                 </View>
                 <Text className={`text-2xl font-pbold ${isDark ? 'text-white' : 'text-black'}`}>
@@ -132,14 +132,14 @@ export default function StatsScreen() {
                 <View className="flex-row items-center mb-2">
                   <Ionicons name="trophy" size={16} color={isDark ? '#BFC2FF' : '#4C52BF'} />
                   <Text className={`text-sm font-psemibold ml-2 ${isDark ? 'text-white' : 'text-primary'}`}>
-                    Best Run
+                    Melhor Corrida
                   </Text>
                 </View>
                 <Text className={`text-lg font-pbold ${isDark ? 'text-white' : 'text-black'}`}>
                   {(totalStats.bestRun.distanceInMeters / 1000).toFixed(2)} km
                 </Text>
                 <Text className={`text-sm mt-1 ${isDark ? 'text-gray-100' : 'text-gray-400'}`}>
-                  {formatTime(Math.floor(totalStats.bestRun.durationInMillis / 1000))} • {new Date(totalStats.bestRun.timestamp).toLocaleDateString()}
+                  {formatTime(Math.floor(totalStats.bestRun.durationInMillis / 1000))} • {new Date(totalStats.bestRun.timestamp).toLocaleDateString('pt-BR')}
                 </Text>
               </View>
             )}

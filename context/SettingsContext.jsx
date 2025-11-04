@@ -5,7 +5,7 @@ const SETTINGS_STORAGE_KEY = '@running_well:settings';
 
 const defaultSettings = {
   // Personal Parameters
-  userName: 'User Name',
+  userName: 'Nome do Usuário',
   weight: 70, // kg
   height: 170, // cm
   age: 30,
@@ -20,6 +20,11 @@ const defaultSettings = {
   
   // App Settings
   theme: 'auto', // 'light' | 'dark' | 'auto'
+  
+  // Goals
+  goalEnabled: false,
+  goalType: 'weekly', // 'daily' | 'weekly' | 'monthly'
+  goalDistance: 10, // km
 };
 
 export const SettingsContext = createContext();

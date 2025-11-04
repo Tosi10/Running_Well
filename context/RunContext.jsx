@@ -120,6 +120,54 @@ export function RunProvider({ children }) {
     };
   }, [runs]);
 
+  const getGoalProgress = useCallback((goalType, goalDistance) => {
+    if (!goalDistance || goalDistance <= 0) {
+      return {
+        current: 0,
+        target: 0,
+        percentage: 0,
+      };
+    }
+
+    const now = new Date();
+    let startDate;
+
+    switch (goalType) {
+      case 'daily':
+        startDate = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+        startDate.setHours(0, 0, 0, 0);
+        break;
+      case 'weekly':
+        startDate = new Date(now);
+        startDate.setDate(now.getDate() - now.getDay()); // Start of week (Sunday)
+        startDate.setHours(0, 0, 0, 0);
+        break;
+      case 'monthly':
+        startDate = new Date(now.getFullYear(), now.getMonth(), 1);
+        break;
+      default:
+        return {
+          current: 0,
+          target: goalDistance,
+          percentage: 0,
+        };
+    }
+
+    const relevantRuns = runs.filter(run => {
+      const runDate = new Date(run.timestamp);
+      return runDate >= startDate;
+    });
+
+    const currentDistance = relevantRuns.reduce((sum, run) => sum + (run.distanceInMeters || 0), 0) / 1000; // Convert to km
+    const percentage = Math.min((currentDistance / goalDistance) * 100, 100);
+
+    return {
+      current: parseFloat(currentDistance.toFixed(2)),
+      target: goalDistance,
+      percentage: parseFloat(percentage.toFixed(1)),
+    };
+  }, [runs]);
+
   return (
     <RunContext.Provider
       value={{
@@ -133,6 +181,7 @@ export function RunProvider({ children }) {
         getTotalStats,
         getWeeklyStats,
         getMonthlyStats,
+        getGoalProgress,
       }}>
       {children}
     </RunContext.Provider>

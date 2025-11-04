@@ -19,8 +19,10 @@ export function useLocationTracking() {
   const watchSubscription = useRef(null);
   const timerInterval = useRef(null);
   const startTime = useRef(null);
+  const pausedTime = useRef(0); // Track accumulated paused time
   const lastLocation = useRef(null);
   const totalDistance = useRef(0); // Use ref to avoid stale closures
+  const isPaused = useRef(false);
 
   useEffect(() => {
     requestPermission();
@@ -73,8 +75,74 @@ export function useLocationTracking() {
         return;
       }
 
+      // If resuming from pause, continue from where we left off
+      if (isPaused.current && pausedTime.current > 0) {
+        // Resume tracking - continue timer from where it was paused
+        setIsTracking(true);
+        isPaused.current = false;
+        
+        // Calculate new start time to account for paused time
+        startTime.current = Date.now() - (pausedTime.current * 1000);
+
+        // Resume timer
+        timerInterval.current = setInterval(() => {
+          if (startTime.current) {
+            const elapsed = Math.floor((Date.now() - startTime.current) / 1000);
+            setTime(elapsed);
+          }
+        }, 1000);
+
+        // Resume location tracking
+        watchSubscription.current = await Location.watchPositionAsync(
+          {
+            accuracy: Location.Accuracy.BestForNavigation,
+            timeInterval: 2000,
+            distanceInterval: 5,
+            mayShowUserSettingsDialog: true,
+          },
+          (location) => {
+            if (!location?.coords) {
+              return;
+            }
+
+            setLocation(location);
+            
+            const newPoint = {
+              latitude: location.coords.latitude,
+              longitude: location.coords.longitude,
+            };
+
+            // Filter out GPS noise and jumps
+            if (lastLocation.current) {
+              const distanceDelta = calculateDistance(
+                lastLocation.current.latitude,
+                lastLocation.current.longitude,
+                newPoint.latitude,
+                newPoint.longitude
+              );
+
+              if (distanceDelta > MIN_DISTANCE_THRESHOLD && distanceDelta < MAX_DISTANCE_THRESHOLD) {
+                totalDistance.current += distanceDelta;
+                setDistance(totalDistance.current);
+                setPathPoints((prev) => [...prev, newPoint]);
+                lastLocation.current = newPoint;
+              } else if (distanceDelta >= MAX_DISTANCE_THRESHOLD) {
+                console.log('GPS jump detected, ignoring:', distanceDelta);
+              }
+            } else {
+              setPathPoints((prev) => [...prev, newPoint]);
+              lastLocation.current = newPoint;
+            }
+          }
+        );
+        return;
+      }
+
+      // Starting fresh - reset everything
       setIsTracking(true);
+      isPaused.current = false;
       startTime.current = Date.now();
+      pausedTime.current = 0;
       setDistance(0);
       totalDistance.current = 0;
       setTime(0);
@@ -167,6 +235,15 @@ export function useLocationTracking() {
 
   const pauseTracking = () => {
     setIsTracking(false);
+    isPaused.current = true;
+    
+    // Save current elapsed time before pausing
+    if (startTime.current) {
+      pausedTime.current = Math.floor((Date.now() - startTime.current) / 1000);
+      // Update the time state to show the paused time
+      setTime(pausedTime.current);
+    }
+    
     if (watchSubscription.current) {
       watchSubscription.current.remove();
       watchSubscription.current = null;
@@ -179,7 +256,9 @@ export function useLocationTracking() {
 
   const stopTracking = () => {
     pauseTracking();
+    isPaused.current = false;
     startTime.current = null;
+    pausedTime.current = 0;
     lastLocation.current = null;
     totalDistance.current = 0;
   };
@@ -201,6 +280,14 @@ export function useLocationTracking() {
       await saveRun(run);
     }
 
+    stopTracking();
+    setLocation(null);
+    setDistance(0);
+    setTime(0);
+    setPathPoints([]);
+  };
+
+  const resetRun = () => {
     stopTracking();
     setLocation(null);
     setDistance(0);
@@ -232,6 +319,7 @@ export function useLocationTracking() {
     startTracking,
     pauseTracking,
     stopTracking,
+    resetRun,
     finishRun,
   };
 }

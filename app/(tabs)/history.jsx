@@ -22,12 +22,12 @@ export default function HistoryScreen() {
 
   const handleDelete = (runId) => {
     Alert.alert(
-      'Delete Run',
-      'Are you sure you want to delete this run?',
+      'Deletar Corrida',
+      'Tem certeza que deseja deletar esta corrida?',
       [
-        { text: 'Cancel', style: 'cancel' },
+        { text: 'Cancelar', style: 'cancel' },
         {
-          text: 'Delete',
+          text: 'Deletar',
           style: 'destructive',
           onPress: () => deleteRun(runId),
         },
@@ -39,13 +39,13 @@ export default function HistoryScreen() {
     <ScrollView className={`flex-1 ${isDark ? 'bg-background-dark' : 'bg-background-light'}`}>
       <View className="px-6 pt-16 pb-8">
         <Text className={`text-2xl font-pbold mb-6 ${isDark ? 'text-white' : 'text-black'}`}>
-          Running History
+          Histórico de Corridas
         </Text>
         {runs.length > 0 ? (
           runs.map((run) => (
             <TouchableOpacity
               key={run.id}
-              className={`rounded-2xl p-4 mb-3 ${isDark ? 'bg-gray-200' : 'bg-gray-100'}`}
+              className={`rounded-2xl p-4 mb-3 border ${isDark ? 'bg-gray-200 border-gray-300/30' : 'bg-gray-100 border-gray-300'}`}
               onPress={() => router.push(`/run-details?runId=${run.id}`)}
               onLongPress={() => handleDelete(run.id)}>
               <View className="flex-row justify-between items-center">
@@ -54,7 +54,7 @@ export default function HistoryScreen() {
                     {(run.distanceInMeters / 1000).toFixed(2)} km
                   </Text>
                   <Text className={`text-sm ${isDark ? 'text-gray-100' : 'text-gray-400'}`}>
-                    {new Date(run.timestamp).toLocaleDateString('en-US', {
+                    {new Date(run.timestamp).toLocaleDateString('pt-BR', {
                       weekday: 'short',
                       month: 'short',
                       day: 'numeric',
@@ -74,15 +74,15 @@ export default function HistoryScreen() {
             </TouchableOpacity>
           ))
         ) : (
-          <View className={`rounded-2xl p-8 items-center ${isDark ? 'bg-gray-200' : 'bg-gray-100'}`}>
+          <View className={`rounded-2xl p-8 items-center border ${isDark ? 'bg-gray-200 border-gray-300/30' : 'bg-gray-100 border-gray-300'}`}>
             <View className="w-32 h-32 rounded-full items-center justify-center mb-4 bg-primary/20">
               <Ionicons name="fitness" size={64} color={isDark ? '#BFC2FF' : '#4C52BF'} />
             </View>
             <Text className={`text-center text-base ${isDark ? 'text-gray-100' : 'text-gray-400'}`}>
-              No runs recorded yet.
+              Ainda não há corridas registradas.
             </Text>
             <Text className={`text-center text-sm mt-2 ${isDark ? 'text-gray-100' : 'text-gray-400'}`}>
-              Start your first run to see your history here.
+              Comece sua primeira corrida para ver seu histórico aqui.
             </Text>
           </View>
         )}
