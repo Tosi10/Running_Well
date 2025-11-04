@@ -1,7 +1,8 @@
 import { useRuns } from '@/context/RunContext';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import { useRouter } from 'expo-router';
-import { Alert, Image, ScrollView, Text, TouchableOpacity, View } from 'react-native';
+import { Alert, ScrollView, Text, TouchableOpacity, View } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 
 export default function HistoryScreen() {
   const colorScheme = useColorScheme();
@@ -73,11 +74,9 @@ export default function HistoryScreen() {
           ))
         ) : (
           <View className={`rounded-2xl p-8 items-center ${isDark ? 'bg-gray-200' : 'bg-gray-100'}`}>
-            <Image
-              source={require('@/assets/images/running_boy.png')}
-              className="w-32 h-32 mb-4"
-              resizeMode="contain"
-            />
+            <View className="w-32 h-32 rounded-full items-center justify-center mb-4 bg-primary/20">
+              <Ionicons name="fitness" size={64} color={isDark ? '#BFC2FF' : '#4C52BF'} />
+            </View>
             <Text className={`text-center text-base ${isDark ? 'text-gray-100' : 'text-gray-400'}`}>
               No runs recorded yet.
             </Text>

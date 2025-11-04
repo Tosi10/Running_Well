@@ -1,7 +1,7 @@
 {
   "expo": {
     "name": "running_well",
-    "slug": "running_well",
+    "slug": "running-well",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
@@ -10,6 +10,9 @@
     "newArchEnabled": true,
     "ios": {
       "supportsTablet": true,
+      "config": {
+        "googleMapsApiKey": "AIzaSyAIQRRLo_O4G94kzvbwwww5N3TBvNXYZtM"
+      },
       "infoPlist": {
         "NSLocationWhenInUseUsageDescription": "This app needs access to your location to track your running routes and distance.",
         "NSLocationAlwaysAndWhenInUseUsageDescription": "This app needs access to your location to track your running routes even when the app is in the background.",
@@ -23,6 +26,11 @@
         "foregroundImage": "./assets/images/android-icon-foreground.png",
         "backgroundImage": "./assets/images/android-icon-background.png",
         "monochromeImage": "./assets/images/android-icon-monochrome.png"
+      },
+      "config": {
+        "googleMaps": {
+          "apiKey": "AIzaSyAIQRRLo_O4G94kzvbwwww5N3TBvNXYZtM"
+        }
       },
       "edgeToEdgeEnabled": true,
       "predictiveBackGestureEnabled": false,
@@ -63,6 +71,13 @@
     "experiments": {
       "typedRoutes": true,
       "reactCompiler": true
-    }
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "f4f16015-1b45-4d20-99e3-49fc16fe9601"
+      }
+    },
+    "owner": "v6core"
   }
 }

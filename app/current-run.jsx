@@ -1,9 +1,10 @@
 import { IconSymbol } from '@/components/ui/icon-symbol';
-import { SimpleMapView } from '@/components/SimpleMapView';
+import { GoogleMapView } from '@/components/GoogleMapView';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import { useLocationTracking } from '@/hooks/useLocationTracking';
 import { useRouter } from 'expo-router';
-import { Alert, Image, Text, TouchableOpacity, View } from 'react-native';
+import { Alert, Text, TouchableOpacity, View } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 
 export default function CurrentRunScreen() {
   const colorScheme = useColorScheme();
@@ -15,6 +16,7 @@ export default function CurrentRunScreen() {
     distance,
     time,
     pathPoints,
+    location,
     startTracking,
     pauseTracking,
     finishRun,
@@ -111,7 +113,14 @@ export default function CurrentRunScreen() {
 
       {/* Map Area */}
       <View className={`flex-1 mx-6 mb-4 rounded-3xl overflow-hidden ${isDark ? 'bg-gray-200' : 'bg-gray-100'}`}>
-        <SimpleMapView pathPoints={pathPoints} isDark={isDark} />
+        <GoogleMapView 
+          pathPoints={pathPoints} 
+          isDark={isDark}
+          currentLocation={location?.coords ? {
+            latitude: location.coords.latitude,
+            longitude: location.coords.longitude,
+          } : null}
+        />
       </View>
 
       {/* Stats Card */}
@@ -128,12 +137,8 @@ export default function CurrentRunScreen() {
           </View>
           <View className="items-center">
             <View className="flex-row items-center mb-2">
-              <Image
-                source={require('@/assets/images/stopwatch.png')}
-                className="w-4 h-4 mr-1"
-                resizeMode="contain"
-              />
-              <Text className={`text-xs ${isDark ? 'text-gray-100' : 'text-gray-400'}`}>
+              <Ionicons name="time" size={16} color={isDark ? '#918F9A' : '#777680'} />
+              <Text className={`text-xs ml-1 ${isDark ? 'text-gray-100' : 'text-gray-400'}`}>
                 TIME
               </Text>
             </View>

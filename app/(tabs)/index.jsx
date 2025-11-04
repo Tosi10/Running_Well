@@ -1,7 +1,8 @@
 import { useRuns } from '@/context/RunContext';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import { useRouter } from 'expo-router';
-import { Image, ScrollView, Text, TouchableOpacity, View } from 'react-native';
+import { ScrollView, Text, TouchableOpacity, View } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 
 export default function HomeScreen() {
   const colorScheme = useColorScheme();
@@ -36,13 +37,9 @@ export default function HomeScreen() {
             </Text>
           </View>
           <TouchableOpacity
-            className="w-12 h-12 rounded-full overflow-hidden"
+            className="w-12 h-12 rounded-full overflow-hidden items-center justify-center bg-primary/20"
             onPress={() => router.push('/profile')}>
-            <Image
-              source={require('@/assets/images/demo_profile_pic.png')}
-              className="w-full h-full"
-              resizeMode="cover"
-            />
+            <Ionicons name="person" size={24} color={isDark ? '#BFC2FF' : '#4C52BF'} />
           </TouchableOpacity>
         </View>
 
@@ -55,12 +52,8 @@ export default function HomeScreen() {
               <Text className="text-white text-2xl font-pbold mb-2">Start Running</Text>
               <Text className="text-white/80 text-sm">Track your run in real-time</Text>
             </View>
-            <View className="w-16 h-16 rounded-full bg-white/20 items-center justify-center overflow-hidden">
-              <Image
-                source={require('@/assets/images/running_boy.png')}
-                className="w-full h-full"
-                resizeMode="contain"
-              />
+            <View className="w-16 h-16 rounded-full bg-white/20 items-center justify-center">
+              <Ionicons name="fitness" size={32} color="#FFFFFF" />
             </View>
           </View>
         </TouchableOpacity>
@@ -68,31 +61,23 @@ export default function HomeScreen() {
         {/* Stats Cards */}
         <View className="flex-row gap-4 mb-6">
           <View className={`flex-1 rounded-2xl p-4 ${isDark ? 'bg-gray-200' : 'bg-gray-100'}`}>
-            <View className="flex-row items-center mb-2">
-              <Image
-                source={require('@/assets/images/fire.png')}
-                className="w-4 h-4 mr-2"
-                resizeMode="contain"
-              />
-              <Text className={`text-xs ${isDark ? 'text-gray-100' : 'text-gray-400'}`}>
-                Total Distance
-              </Text>
-            </View>
+              <View className="flex-row items-center mb-2">
+                <Ionicons name="flame" size={16} color={isDark ? '#918F9A' : '#777680'} />
+                <Text className={`text-xs ml-2 ${isDark ? 'text-gray-100' : 'text-gray-400'}`}>
+                  Total Distance
+                </Text>
+              </View>
             <Text className={`text-2xl font-pbold ${isDark ? 'text-white' : 'text-black'}`}>
               {stats.totalDistance} km
             </Text>
           </View>
           <View className={`flex-1 rounded-2xl p-4 ${isDark ? 'bg-gray-200' : 'bg-gray-100'}`}>
-            <View className="flex-row items-center mb-2">
-              <Image
-                source={require('@/assets/images/stopwatch.png')}
-                className="w-4 h-4 mr-2"
-                resizeMode="contain"
-              />
-              <Text className={`text-xs ${isDark ? 'text-gray-100' : 'text-gray-400'}`}>
-                Total Time
-              </Text>
-            </View>
+              <View className="flex-row items-center mb-2">
+                <Ionicons name="time" size={16} color={isDark ? '#918F9A' : '#777680'} />
+                <Text className={`text-xs ml-2 ${isDark ? 'text-gray-100' : 'text-gray-400'}`}>
+                  Total Time
+                </Text>
+              </View>
             <Text className={`text-2xl font-pbold ${isDark ? 'text-white' : 'text-black'}`}>
               {formatTime(stats.totalTime)}
             </Text>

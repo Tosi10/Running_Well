@@ -2,7 +2,8 @@ import { IconSymbol } from '@/components/ui/icon-symbol';
 import { useSettings } from '@/context/SettingsContext';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import { useRouter } from 'expo-router';
-import { Image, ScrollView, Text, TouchableOpacity, View } from 'react-native';
+import { ScrollView, Text, TouchableOpacity, View } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 
 export default function ProfileScreen() {
   const colorScheme = useColorScheme();
@@ -20,12 +21,8 @@ export default function ProfileScreen() {
         {/* Profile Card */}
         <View className={`rounded-3xl p-6 mb-6 ${isDark ? 'bg-gray-200' : 'bg-gray-100'}`}>
           <View className="items-center mb-6">
-            <View className="w-24 h-24 rounded-full overflow-hidden mb-4 border-4 border-primary">
-              <Image
-                source={require('@/assets/images/demo_profile_pic.png')}
-                className="w-full h-full"
-                resizeMode="cover"
-              />
+            <View className="w-24 h-24 rounded-full overflow-hidden mb-4 border-4 border-primary items-center justify-center bg-primary/20">
+              <Ionicons name="person" size={48} color={isDark ? '#BFC2FF' : '#4C52BF'} />
             </View>
             <Text className={`text-xl font-pbold mb-1 ${isDark ? 'text-white' : 'text-black'}`}>
               {settings.userName}
