@@ -9,7 +9,13 @@
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "infoPlist": {
+        "NSLocationWhenInUseUsageDescription": "This app needs access to your location to track your running routes and distance.",
+        "NSLocationAlwaysAndWhenInUseUsageDescription": "This app needs access to your location to track your running routes even when the app is in the background.",
+        "NSLocationAlwaysUsageDescription": "This app needs access to your location to track your running routes even when the app is in the background."
+      },
+      "bundleIdentifier": "com.runningwell.app"
     },
     "android": {
       "adaptiveIcon": {
@@ -19,7 +25,13 @@
         "monochromeImage": "./assets/images/android-icon-monochrome.png"
       },
       "edgeToEdgeEnabled": true,
-      "predictiveBackGestureEnabled": false
+      "predictiveBackGestureEnabled": false,
+      "permissions": [
+        "ACCESS_FINE_LOCATION",
+        "ACCESS_COARSE_LOCATION",
+        "ACCESS_BACKGROUND_LOCATION"
+      ],
+      "package": "com.runningwell.app"
     },
     "web": {
       "output": "static",
@@ -27,6 +39,14 @@
     },
     "plugins": [
       "expo-router",
+      [
+        "expo-location",
+        {
+          "locationAlwaysAndWhenInUsePermission": "Allow Running Well to use your location to track your runs.",
+          "locationAlwaysPermission": "Allow Running Well to use your location to track your runs in the background.",
+          "locationWhenInUsePermission": "Allow Running Well to use your location to track your runs."
+        }
+      ],
       [
         "expo-splash-screen",
         {
