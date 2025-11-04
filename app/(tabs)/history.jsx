@@ -46,6 +46,7 @@ export default function HistoryScreen() {
             <TouchableOpacity
               key={run.id}
               className={`rounded-2xl p-4 mb-3 ${isDark ? 'bg-gray-200' : 'bg-gray-100'}`}
+              onPress={() => router.push(`/run-details?runId=${run.id}`)}
               onLongPress={() => handleDelete(run.id)}>
               <View className="flex-row justify-between items-center">
                 <View className="flex-1">

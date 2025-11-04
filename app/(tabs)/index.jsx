@@ -100,7 +100,8 @@ export default function HomeScreen() {
             recentRuns.map((run) => (
               <TouchableOpacity
                 key={run.id}
-                className={`rounded-2xl p-4 mb-3 ${isDark ? 'bg-gray-200' : 'bg-gray-100'}`}>
+                className={`rounded-2xl p-4 mb-3 ${isDark ? 'bg-gray-200' : 'bg-gray-100'}`}
+                onPress={() => router.push(`/run-details?runId=${run.id}`)}>
                 <View className="flex-row justify-between items-center">
                   <View className="flex-1">
                     <Text className={`text-base font-psemibold mb-1 ${isDark ? 'text-white' : 'text-black'}`}>

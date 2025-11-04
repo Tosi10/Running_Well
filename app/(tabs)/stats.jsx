@@ -1,3 +1,4 @@
+import { useRuns } from '@/context/RunContext';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import { ScrollView, Text, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
@@ -5,6 +6,21 @@ import { Ionicons } from '@expo/vector-icons';
 export default function StatsScreen() {
   const colorScheme = useColorScheme();
   const isDark = colorScheme === 'dark';
+  const { getTotalStats, getWeeklyStats, getMonthlyStats } = useRuns();
+  
+  const weeklyStats = getWeeklyStats();
+  const monthlyStats = getMonthlyStats();
+  const totalStats = getTotalStats();
+
+  const formatTime = (seconds) => {
+    const hrs = Math.floor(seconds / 3600);
+    const mins = Math.floor((seconds % 3600) / 60);
+    const secs = seconds % 60;
+    if (hrs > 0) {
+      return `${hrs}:${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+    }
+    return `${mins}:${secs.toString().padStart(2, '0')}`;
+  };
 
   return (
     <ScrollView className={`flex-1 ${isDark ? 'bg-background-dark' : 'bg-background-light'}`}>
@@ -27,7 +43,7 @@ export default function StatsScreen() {
                   </Text>
                 </View>
               <Text className={`text-xl font-pbold ${isDark ? 'text-white' : 'text-black'}`}>
-                0 km
+                {weeklyStats.distance} km
               </Text>
             </View>
             <View className="flex-1">
@@ -38,7 +54,7 @@ export default function StatsScreen() {
                   </Text>
                 </View>
               <Text className={`text-xl font-pbold ${isDark ? 'text-white' : 'text-black'}`}>
-                0:00
+                {formatTime(weeklyStats.time)}
               </Text>
             </View>
             <View className="flex-1">
@@ -49,7 +65,7 @@ export default function StatsScreen() {
                   </Text>
                 </View>
               <Text className={`text-xl font-pbold ${isDark ? 'text-white' : 'text-black'}`}>
-                0
+                {weeklyStats.runs}
               </Text>
             </View>
           </View>
@@ -60,11 +76,73 @@ export default function StatsScreen() {
           <Text className={`text-lg font-psemibold mb-4 ${isDark ? 'text-white' : 'text-black'}`}>
             All Time
           </Text>
-          <View className={`rounded-xl p-4 items-center ${isDark ? 'bg-black-200' : 'bg-white'}`}>
-            <Text className={`text-4xl mb-2`}>📈</Text>
-            <Text className={`text-center text-sm ${isDark ? 'text-gray-100' : 'text-gray-400'}`}>
-              Statistics will appear here as you run.
-            </Text>
+          <View className="space-y-4">
+            <View className="flex-row justify-between">
+              <View className="flex-1">
+                <View className="flex-row items-center mb-1">
+                  <Ionicons name="flame" size={12} color={isDark ? '#918F9A' : '#777680'} />
+                  <Text className={`text-xs ml-1 ${isDark ? 'text-gray-100' : 'text-gray-400'}`}>
+                    Total Distance
+                  </Text>
+                </View>
+                <Text className={`text-2xl font-pbold ${isDark ? 'text-white' : 'text-black'}`}>
+                  {totalStats.totalDistance} km
+                </Text>
+              </View>
+              <View className="flex-1">
+                <View className="flex-row items-center mb-1">
+                  <Ionicons name="time" size={12} color={isDark ? '#918F9A' : '#777680'} />
+                  <Text className={`text-xs ml-1 ${isDark ? 'text-gray-100' : 'text-gray-400'}`}>
+                    Total Time
+                  </Text>
+                </View>
+                <Text className={`text-2xl font-pbold ${isDark ? 'text-white' : 'text-black'}`}>
+                  {formatTime(totalStats.totalTime)}
+                </Text>
+              </View>
+            </View>
+            
+            <View className="flex-row justify-between mt-4">
+              <View className="flex-1">
+                <View className="flex-row items-center mb-1">
+                  <Ionicons name="flash" size={12} color={isDark ? '#918F9A' : '#777680'} />
+                  <Text className={`text-xs ml-1 ${isDark ? 'text-gray-100' : 'text-gray-400'}`}>
+                    Total Runs
+                  </Text>
+                </View>
+                <Text className={`text-2xl font-pbold ${isDark ? 'text-white' : 'text-black'}`}>
+                  {totalStats.totalRuns}
+                </Text>
+              </View>
+              <View className="flex-1">
+                <View className="flex-row items-center mb-1">
+                  <Ionicons name="speedometer" size={12} color={isDark ? '#918F9A' : '#777680'} />
+                  <Text className={`text-xs ml-1 ${isDark ? 'text-gray-100' : 'text-gray-400'}`}>
+                    Avg Speed
+                  </Text>
+                </View>
+                <Text className={`text-2xl font-pbold ${isDark ? 'text-white' : 'text-black'}`}>
+                  {totalStats.avgSpeed} km/h
+                </Text>
+              </View>
+            </View>
+
+            {totalStats.bestRun && (
+              <View className={`mt-4 p-4 rounded-xl ${isDark ? 'bg-primary-200' : 'bg-primary/20'}`}>
+                <View className="flex-row items-center mb-2">
+                  <Ionicons name="trophy" size={16} color={isDark ? '#BFC2FF' : '#4C52BF'} />
+                  <Text className={`text-sm font-psemibold ml-2 ${isDark ? 'text-white' : 'text-primary'}`}>
+                    Best Run
+                  </Text>
+                </View>
+                <Text className={`text-lg font-pbold ${isDark ? 'text-white' : 'text-black'}`}>
+                  {(totalStats.bestRun.distanceInMeters / 1000).toFixed(2)} km
+                </Text>
+                <Text className={`text-sm mt-1 ${isDark ? 'text-gray-100' : 'text-gray-400'}`}>
+                  {formatTime(Math.floor(totalStats.bestRun.durationInMillis / 1000))} • {new Date(totalStats.bestRun.timestamp).toLocaleDateString()}
+                </Text>
+              </View>
+            )}
           </View>
         </View>
       </View>

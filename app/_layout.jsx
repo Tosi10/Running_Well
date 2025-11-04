@@ -21,12 +21,13 @@ export default function RootLayout() {
       <SettingsProvider>
         <RunProvider>
           <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-            <Stack>
-              <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-              <Stack.Screen name="current-run" options={{ headerShown: false, presentation: 'fullScreenModal' }} />
-              <Stack.Screen name="personal-parameters" options={{ headerShown: false, presentation: 'modal' }} />
-              <Stack.Screen name="modal" options={{ presentation: 'modal', title: 'Modal' }} />
-            </Stack>
+              <Stack>
+                <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+                <Stack.Screen name="current-run" options={{ headerShown: false, presentation: 'fullScreenModal' }} />
+                <Stack.Screen name="personal-parameters" options={{ headerShown: false, presentation: 'modal' }} />
+                <Stack.Screen name="run-details" options={{ headerShown: false, presentation: 'card' }} />
+                <Stack.Screen name="modal" options={{ presentation: 'modal', title: 'Modal' }} />
+              </Stack>
             <StatusBar style="auto" />
           </ThemeProvider>
         </RunProvider>

@@ -57,9 +57,66 @@ export function RunProvider({ children }) {
   const getTotalStats = useCallback(() => {
     const totalDistance = runs.reduce((sum, run) => sum + (run.distanceInMeters || 0), 0);
     const totalTime = runs.reduce((sum, run) => sum + (run.durationInMillis || 0), 0);
+    const totalRuns = runs.length;
+    const avgSpeed = totalRuns > 0 
+      ? runs.reduce((sum, run) => sum + (run.avgSpeedInKMH || 0), 0) / totalRuns 
+      : 0;
+    
+    // Find best run (longest distance)
+    const bestRun = runs.length > 0 
+      ? runs.reduce((best, run) => 
+          (run.distanceInMeters || 0) > (best.distanceInMeters || 0) ? run : best
+        )
+      : null;
+
     return {
       totalDistance: (totalDistance / 1000).toFixed(2),
       totalTime: Math.floor(totalTime / 1000),
+      totalRuns,
+      avgSpeed: avgSpeed.toFixed(1),
+      bestRun,
+    };
+  }, [runs]);
+
+  const getWeeklyStats = useCallback(() => {
+    const now = new Date();
+    const startOfWeek = new Date(now);
+    startOfWeek.setDate(now.getDate() - now.getDay()); // Start of week (Sunday)
+    startOfWeek.setHours(0, 0, 0, 0);
+
+    const weeklyRuns = runs.filter(run => {
+      const runDate = new Date(run.timestamp);
+      return runDate >= startOfWeek;
+    });
+
+    const weeklyDistance = weeklyRuns.reduce((sum, run) => sum + (run.distanceInMeters || 0), 0);
+    const weeklyTime = weeklyRuns.reduce((sum, run) => sum + (run.durationInMillis || 0), 0);
+    const weeklyCount = weeklyRuns.length;
+
+    return {
+      distance: (weeklyDistance / 1000).toFixed(2),
+      time: Math.floor(weeklyTime / 1000),
+      runs: weeklyCount,
+    };
+  }, [runs]);
+
+  const getMonthlyStats = useCallback(() => {
+    const now = new Date();
+    const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+
+    const monthlyRuns = runs.filter(run => {
+      const runDate = new Date(run.timestamp);
+      return runDate >= startOfMonth;
+    });
+
+    const monthlyDistance = monthlyRuns.reduce((sum, run) => sum + (run.distanceInMeters || 0), 0);
+    const monthlyTime = monthlyRuns.reduce((sum, run) => sum + (run.durationInMillis || 0), 0);
+    const monthlyCount = monthlyRuns.length;
+
+    return {
+      distance: (monthlyDistance / 1000).toFixed(2),
+      time: Math.floor(monthlyTime / 1000),
+      runs: monthlyCount,
     };
   }, [runs]);
 
@@ -74,6 +131,8 @@ export function RunProvider({ children }) {
         saveRun,
         deleteRun,
         getTotalStats,
+        getWeeklyStats,
+        getMonthlyStats,
       }}>
       {children}
     </RunContext.Provider>
