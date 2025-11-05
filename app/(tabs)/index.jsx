@@ -1,11 +1,12 @@
+import { useAchievements } from '@/context/AchievementsContext';
+import { useLocationTracking } from '@/context/LocationTrackingProvider';
 import { useRuns } from '@/context/RunContext';
 import { useSettings } from '@/context/SettingsContext';
-import { useAchievements } from '@/context/AchievementsContext';
 import { useColorScheme } from '@/hooks/use-color-scheme';
+import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { useEffect } from 'react';
 import { ScrollView, Text, TouchableOpacity, View } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
 
 export default function HomeScreen() {
   const colorScheme = useColorScheme();
@@ -14,7 +15,18 @@ export default function HomeScreen() {
   const { runs, getTotalStats, getGoalProgress } = useRuns();
   const { settings } = useSettings();
   const { checkGoalAchievement } = useAchievements();
+  const { isTracking, distance, time } = useLocationTracking();
   const stats = getTotalStats();
+  
+  const formatTime = (seconds) => {
+    const hrs = Math.floor(seconds / 3600);
+    const mins = Math.floor((seconds % 3600) / 60);
+    const secs = seconds % 60;
+    if (hrs > 0) {
+      return `${hrs}:${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+    }
+    return `${mins}:${secs.toString().padStart(2, '0')}`;
+  };
   
   const goalProgress = settings.goalEnabled
     ? getGoalProgress(settings.goalType, settings.goalDistance, settings.goalStartDate)
@@ -30,16 +42,6 @@ export default function HomeScreen() {
       );
     }
   }, [goalProgress, settings.goalEnabled, settings.goalType, settings.goalDistance, checkGoalAchievement]);
-
-  const formatTime = (seconds) => {
-    const hrs = Math.floor(seconds / 3600);
-    const mins = Math.floor((seconds % 3600) / 60);
-    const secs = seconds % 60;
-    if (hrs > 0) {
-      return `${hrs}:${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
-    }
-    return `${mins}:${secs.toString().padStart(2, '0')}`;
-  };
 
   const recentRuns = runs.slice(0, 3);
 
@@ -63,20 +65,44 @@ export default function HomeScreen() {
           </TouchableOpacity>
         </View>
 
-        {/* Quick Start Card */}
-        <TouchableOpacity
-          className={`rounded-3xl p-6 mb-6 ${isDark ? 'bg-primary-200' : 'bg-primary'}`}
-          onPress={() => router.push('/current-run')}>
-          <View className="flex-row items-center justify-between">
-            <View className="flex-1">
-              <Text className="text-white text-2xl font-pbold mb-2">Iniciar Corrida</Text>
-              <Text className="text-white/80 text-sm">Acompanhe sua corrida em tempo real</Text>
+        {/* Active Run Banner */}
+        {(isTracking || time > 0 || distance > 0) && (
+          <TouchableOpacity
+            className={`rounded-2xl p-4 mb-6 border-2 ${isDark ? 'bg-secondary/20 border-secondary' : 'bg-secondary/10 border-secondary'}`}
+            onPress={() => router.push('/current-run')}>
+            <View className="flex-row items-center justify-between">
+              <View className="flex-row items-center flex-1">
+                <View className={`w-3 h-3 rounded-full mr-3 ${isTracking ? 'bg-secondary' : 'bg-gray-400'}`} />
+                <View className="flex-1">
+                  <Text className={`text-base font-psemibold ${isDark ? 'text-white' : 'text-black'}`}>
+                    {isTracking ? 'Corrida em Andamento' : 'Corrida Pausada'}
+                  </Text>
+                  <Text className={`text-sm mt-1 ${isDark ? 'text-gray-100' : 'text-gray-600'}`}>
+                    {distance.toFixed(2)} km • {formatTime(time)}
+                  </Text>
+                </View>
+              </View>
+              <Ionicons name="chevron-forward" size={20} color={isDark ? '#33A853' : '#1B8652'} />
             </View>
-            <View className="w-16 h-16 rounded-full bg-white/20 items-center justify-center">
-              <Ionicons name="fitness" size={32} color="#FFFFFF" />
+          </TouchableOpacity>
+        )}
+
+        {/* Quick Start Card - Only show if no active run */}
+        {!(isTracking || time > 0 || distance > 0) && (
+          <TouchableOpacity
+            className={`rounded-3xl p-6 mb-6 ${isDark ? 'bg-primary-200' : 'bg-primary'}`}
+            onPress={() => router.push('/current-run')}>
+            <View className="flex-row items-center justify-between">
+              <View className="flex-1">
+                <Text className="text-white text-2xl font-pbold mb-2">Iniciar Corrida</Text>
+                <Text className="text-white/80 text-sm">Acompanhe sua corrida em tempo real</Text>
+              </View>
+              <View className="w-16 h-16 rounded-full bg-white/20 items-center justify-center">
+                <Ionicons name="fitness" size={32} color="#FFFFFF" />
+              </View>
             </View>
-          </View>
-        </TouchableOpacity>
+          </TouchableOpacity>
+        )}
 
         {/* Goal Card */}
         {settings.goalEnabled && goalProgress && (

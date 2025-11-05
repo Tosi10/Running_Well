@@ -1,16 +1,20 @@
-import { IconSymbol } from '@/components/ui/icon-symbol';
 import { GoogleMapView } from '@/components/GoogleMapView';
+import { IconSymbol } from '@/components/ui/icon-symbol';
+import { useLocationTracking } from '@/context/LocationTrackingProvider';
+import { useRuns } from '@/context/RunContext';
 import { useColorScheme } from '@/hooks/use-color-scheme';
-import { useLocationTracking } from '@/hooks/useLocationTracking';
+import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { Alert, Text, TouchableOpacity, View } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 export default function CurrentRunScreen() {
   const colorScheme = useColorScheme();
   const router = useRouter();
   const isDark = colorScheme === 'dark';
+  const insets = useSafeAreaInsets();
   
+  const { saveRun } = useRuns();
   const {
     isTracking,
     distance,
@@ -19,7 +23,6 @@ export default function CurrentRunScreen() {
     location,
     startTracking,
     pauseTracking,
-    finishRun,
     resetRun,
     hasPermission,
   } = useLocationTracking();
@@ -42,6 +45,11 @@ export default function CurrentRunScreen() {
     return `${mins}:${secs.toString().padStart(2, '0')}`;
   };
 
+  // Allow navigation - run continues in background
+  const handleBackPress = () => {
+    router.back();
+  };
+
   const handlePlayPause = () => {
     if (!hasPermission) {
       Alert.alert('Permissão Necessária', 'Por favor, habilite as permissões de localização para rastrear sua corrida.');
@@ -56,7 +64,7 @@ export default function CurrentRunScreen() {
   };
 
   const handleStop = () => {
-    // If tracking or has data, show confirmation
+    // Only show confirmation if there's an active run or data
     if (isTracking || time > 0 || distance > 0) {
       Alert.alert(
         'Zerar Corrida',
@@ -72,10 +80,8 @@ export default function CurrentRunScreen() {
           },
         ]
       );
-    } else {
-      // If no tracking or data, just go back
-      router.back();
     }
+    // If no tracking or data, don't do anything - button should be disabled/not visible
   };
 
   const handleFinish = async () => {
@@ -84,6 +90,11 @@ export default function CurrentRunScreen() {
       Alert.alert('Sem Dados de Corrida', 'Por favor, inicie uma corrida antes de finalizar.');
       return;
     }
+
+    // Calculate total distance in meters for the run
+    // We need to access the totalDistance ref from the context
+    // For now, we'll use the distance state which should be accurate
+    const distanceInMeters = Math.round(distance * 1000);
 
     // Warn if distance is 0 (common in emulator) but still allow saving
     if (distance === 0) {
@@ -95,7 +106,16 @@ export default function CurrentRunScreen() {
           {
             text: 'Salvar',
             onPress: async () => {
-              await finishRun();
+              const run = {
+                id: Date.now().toString(),
+                distanceInMeters: 0,
+                durationInMillis: time * 1000,
+                timestamp: new Date().toISOString(),
+                pathPoints: pathPoints,
+                avgSpeedInKMH: 0,
+              };
+              await saveRun(run);
+              resetRun();
               router.back();
             },
           },
@@ -112,7 +132,18 @@ export default function CurrentRunScreen() {
         {
           text: 'Salvar',
           onPress: async () => {
-            await finishRun();
+            const run = {
+              id: Date.now().toString(),
+              distanceInMeters: distanceInMeters,
+              durationInMillis: time * 1000,
+              timestamp: new Date().toISOString(),
+              pathPoints: pathPoints,
+              avgSpeedInKMH: time > 0 && distance > 0 
+                ? parseFloat((distance / (time / 3600)).toFixed(2)) 
+                : 0,
+            };
+            await saveRun(run);
+            resetRun();
             router.back();
           },
         },
@@ -125,7 +156,7 @@ export default function CurrentRunScreen() {
       {/* Top Bar */}
       <View className="px-6 pt-16 pb-4 flex-row items-center justify-between">
         <TouchableOpacity
-          onPress={() => router.back()}
+          onPress={handleBackPress}
           className="w-10 h-10 items-center justify-center">
           <IconSymbol name="chevron.left" size={24} color={isDark ? '#E5E1E6' : '#1B1B1F'} />
         </TouchableOpacity>
@@ -135,8 +166,8 @@ export default function CurrentRunScreen() {
         <View className="w-10" />
       </View>
 
-      {/* Map Area */}
-      <View className={`flex-1 mx-6 mb-4 rounded-3xl overflow-hidden ${isDark ? 'bg-gray-200' : 'bg-gray-100'}`}>
+      {/* Map Area - Reduced height to make room for controls */}
+      <View className={`mx-6 mb-4 rounded-3xl overflow-hidden ${isDark ? 'bg-gray-200' : 'bg-gray-100'}`} style={{ height: '55%' }}>
         <GoogleMapView 
           pathPoints={pathPoints} 
           isDark={isDark}
@@ -148,8 +179,10 @@ export default function CurrentRunScreen() {
         />
       </View>
 
-      {/* Stats Card */}
-      <View className={`mx-6 mb-8 rounded-3xl p-6 border ${isDark ? 'bg-gray-200 border-gray-300/30' : 'bg-white border-gray-300'} shadow-lg`}>
+      {/* Stats Card - Added safe area bottom padding */}
+      <View 
+        className={`mx-6 rounded-3xl p-6 border ${isDark ? 'bg-gray-200 border-gray-300/30' : 'bg-white border-gray-300'} shadow-lg`}
+        style={{ marginBottom: Math.max(insets.bottom, 16) }}>
         {/* Main Stats */}
         <View className="flex-row justify-around mb-6">
           <View className="items-center">

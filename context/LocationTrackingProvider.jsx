@@ -1,14 +1,14 @@
 import * as Location from 'expo-location';
-import { useEffect, useRef, useState } from 'react';
-import { useRuns } from '../context/RunContext';
+import { createContext, useContext, useEffect, useRef, useState } from 'react';
 
 // Minimum distance threshold to filter GPS noise (in km)
 const MIN_DISTANCE_THRESHOLD = 0.0005; // ~0.5 meters
 // Maximum distance threshold to filter GPS jumps (in km)
 const MAX_DISTANCE_THRESHOLD = 0.1; // ~100 meters
 
-export function useLocationTracking() {
-  const { setCurrentRun, saveRun } = useRuns();
+const LocationTrackingContext = createContext();
+
+export function LocationTrackingProvider({ children }) {
   const [isTracking, setIsTracking] = useState(false);
   const [hasPermission, setHasPermission] = useState(false);
   const [location, setLocation] = useState(null);
@@ -19,15 +19,15 @@ export function useLocationTracking() {
   const watchSubscription = useRef(null);
   const timerInterval = useRef(null);
   const startTime = useRef(null);
-  const pausedTime = useRef(0); // Track accumulated paused time
+  const pausedTime = useRef(0);
   const lastLocation = useRef(null);
-  const totalDistance = useRef(0); // Use ref to avoid stale closures
+  const totalDistance = useRef(0);
   const isPaused = useRef(false);
 
   useEffect(() => {
     requestPermission();
     
-    // Get current location immediately when component mounts (for map display)
+    // Get current location immediately when provider mounts (for map display)
     const getInitialLocation = async () => {
       try {
         const { status } = await Location.getForegroundPermissionsAsync();
@@ -54,20 +54,17 @@ export function useLocationTracking() {
 
   const requestPermission = async () => {
     try {
-      // Request foreground permission first
       const { status: foregroundStatus } = await Location.requestForegroundPermissionsAsync();
       
       if (foregroundStatus === 'granted') {
         setHasPermission(true);
         
-        // For Android, also request background permission (optional but recommended)
         try {
           const { status: backgroundStatus } = await Location.requestBackgroundPermissionsAsync();
           if (backgroundStatus === 'granted') {
             console.log('Background location permission granted');
           }
         } catch (error) {
-          // Background permission might not be available on all platforms
           console.log('Background permission not available:', error);
         }
       } else {
@@ -79,6 +76,20 @@ export function useLocationTracking() {
     }
   };
 
+  const calculateDistance = (lat1, lon1, lat2, lon2) => {
+    const R = 6371; // Radius of the Earth in km
+    const dLat = (lat2 - lat1) * Math.PI / 180;
+    const dLon = (lon2 - lon1) * Math.PI / 180;
+    const a =
+      Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+      Math.cos(lat1 * Math.PI / 180) *
+        Math.cos(lat2 * Math.PI / 180) *
+        Math.sin(dLon / 2) *
+        Math.sin(dLon / 2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    return R * c;
+  };
+
   const startTracking = async () => {
     if (!hasPermission) {
       await requestPermission();
@@ -88,7 +99,6 @@ export function useLocationTracking() {
     }
 
     try {
-      // Check if location services are enabled
       const enabled = await Location.hasServicesEnabledAsync();
       if (!enabled) {
         console.error('Location services are disabled');
@@ -96,16 +106,12 @@ export function useLocationTracking() {
         return;
       }
 
-      // If resuming from pause, continue from where we left off
+      // If resuming from pause
       if (isPaused.current && pausedTime.current > 0) {
-        // Resume tracking - continue timer from where it was paused
         setIsTracking(true);
         isPaused.current = false;
-        
-        // Calculate new start time to account for paused time
         startTime.current = Date.now() - (pausedTime.current * 1000);
 
-        // Resume timer
         timerInterval.current = setInterval(() => {
           if (startTime.current) {
             const elapsed = Math.floor((Date.now() - startTime.current) / 1000);
@@ -113,7 +119,6 @@ export function useLocationTracking() {
           }
         }, 1000);
 
-        // Resume location tracking
         watchSubscription.current = await Location.watchPositionAsync(
           {
             accuracy: Location.Accuracy.BestForNavigation,
@@ -122,9 +127,7 @@ export function useLocationTracking() {
             mayShowUserSettingsDialog: true,
           },
           (location) => {
-            if (!location?.coords) {
-              return;
-            }
+            if (!location?.coords) return;
 
             setLocation(location);
             
@@ -133,7 +136,6 @@ export function useLocationTracking() {
               longitude: location.coords.longitude,
             };
 
-            // Filter out GPS noise and jumps
             if (lastLocation.current) {
               const distanceDelta = calculateDistance(
                 lastLocation.current.latitude,
@@ -159,7 +161,7 @@ export function useLocationTracking() {
         return;
       }
 
-      // Starting fresh - reset everything
+      // Starting fresh
       setIsTracking(true);
       isPaused.current = false;
       startTime.current = Date.now();
@@ -170,7 +172,6 @@ export function useLocationTracking() {
       setPathPoints([]);
       lastLocation.current = null;
 
-      // Start timer immediately (don't wait for location)
       timerInterval.current = setInterval(() => {
         if (startTime.current) {
           const elapsed = Math.floor((Date.now() - startTime.current) / 1000);
@@ -178,28 +179,20 @@ export function useLocationTracking() {
         }
       }, 1000);
 
-      // Get initial location quickly with timeout
       const getInitialLocationPromise = Location.getCurrentPositionAsync({
-        accuracy: Location.Accuracy.Balanced, // Use Balanced for faster initial lock
-        timeout: 5000, // 5 second timeout
+        accuracy: Location.Accuracy.Balanced,
+        timeout: 5000,
       }).catch(() => null);
 
-      // Start location tracking immediately (don't wait for initial location)
       watchSubscription.current = await Location.watchPositionAsync(
         {
-          // Use BestForNavigation for running (highest accuracy)
           accuracy: Location.Accuracy.BestForNavigation,
-          // Update every 2 seconds (balance between accuracy and battery)
           timeInterval: 2000,
-          // Update every 5 meters (more accurate for running)
           distanceInterval: 5,
-          // Enable high accuracy mode
           mayShowUserSettingsDialog: true,
         },
         (location) => {
-          if (!location?.coords) {
-            return;
-          }
+          if (!location?.coords) return;
 
           setLocation(location);
           
@@ -208,7 +201,6 @@ export function useLocationTracking() {
             longitude: location.coords.longitude,
           };
 
-          // Filter out GPS noise and jumps
           if (lastLocation.current) {
             const distanceDelta = calculateDistance(
               lastLocation.current.latitude,
@@ -217,28 +209,22 @@ export function useLocationTracking() {
               newPoint.longitude
             );
 
-            // Filter: ignore very small movements (GPS noise)
-            // and very large jumps (GPS errors)
             if (distanceDelta > MIN_DISTANCE_THRESHOLD && distanceDelta < MAX_DISTANCE_THRESHOLD) {
               totalDistance.current += distanceDelta;
               setDistance(totalDistance.current);
               setPathPoints((prev) => [...prev, newPoint]);
               lastLocation.current = newPoint;
             } else if (distanceDelta >= MAX_DISTANCE_THRESHOLD) {
-              // GPS jump detected, log but don't add to distance
               console.log('GPS jump detected, ignoring:', distanceDelta);
             }
-            // If distance is too small, ignore (GPS noise)
           } else {
-            // First point - always add it
             setPathPoints([newPoint]);
             lastLocation.current = newPoint;
-            setLocation(location); // Ensure location state is set immediately
+            setLocation(location);
           }
         }
       );
 
-      // Try to get initial location (non-blocking)
       getInitialLocationPromise.then((initialLocation) => {
         if (initialLocation?.coords && !lastLocation.current) {
           const initialPoint = {
@@ -261,10 +247,8 @@ export function useLocationTracking() {
     setIsTracking(false);
     isPaused.current = true;
     
-    // Save current elapsed time before pausing
     if (startTime.current) {
       pausedTime.current = Math.floor((Date.now() - startTime.current) / 1000);
-      // Update the time state to show the paused time
       setTime(pausedTime.current);
     }
     
@@ -287,30 +271,6 @@ export function useLocationTracking() {
     totalDistance.current = 0;
   };
 
-  const finishRun = async () => {
-    // Allow saving even if distance is 0 (for emulator testing)
-    if (time > 0) {
-      const run = {
-        id: Date.now().toString(),
-        distanceInMeters: Math.round(totalDistance.current * 1000),
-        durationInMillis: time * 1000,
-        timestamp: new Date().toISOString(),
-        pathPoints: pathPoints,
-        avgSpeedInKMH: time > 0 && totalDistance.current > 0 
-          ? parseFloat((totalDistance.current / (time / 3600)).toFixed(2)) 
-          : 0,
-      };
-
-      await saveRun(run);
-    }
-
-    stopTracking();
-    setLocation(null);
-    setDistance(0);
-    setTime(0);
-    setPathPoints([]);
-  };
-
   const resetRun = () => {
     stopTracking();
     setLocation(null);
@@ -319,32 +279,31 @@ export function useLocationTracking() {
     setPathPoints([]);
   };
 
-  const calculateDistance = (lat1, lon1, lat2, lon2) => {
-    const R = 6371; // Radius of the Earth in km
-    const dLat = (lat2 - lat1) * Math.PI / 180;
-    const dLon = (lon2 - lon1) * Math.PI / 180;
-    const a =
-      Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-      Math.cos(lat1 * Math.PI / 180) *
-        Math.cos(lat2 * Math.PI / 180) *
-        Math.sin(dLon / 2) *
-        Math.sin(dLon / 2);
-    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-    return R * c; // Distance in km
-  };
+  return (
+    <LocationTrackingContext.Provider
+      value={{
+        isTracking,
+        hasPermission,
+        location,
+        distance,
+        time,
+        pathPoints,
+        startTracking,
+        pauseTracking,
+        stopTracking,
+        resetRun,
+        requestPermission,
+      }}>
+      {children}
+    </LocationTrackingContext.Provider>
+  );
+}
 
-  return {
-    isTracking,
-    hasPermission,
-    location,
-    distance,
-    time,
-    pathPoints,
-    startTracking,
-    pauseTracking,
-    stopTracking,
-    resetRun,
-    finishRun,
-  };
+export function useLocationTracking() {
+  const context = useContext(LocationTrackingContext);
+  if (!context) {
+    throw new Error('useLocationTracking must be used within LocationTrackingProvider');
+  }
+  return context;
 }
 
