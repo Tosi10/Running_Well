@@ -25,6 +25,7 @@ const defaultSettings = {
   goalEnabled: false,
   goalType: 'weekly', // 'daily' | 'weekly' | 'monthly'
   goalDistance: 10, // km
+  goalStartDate: null, // Timestamp when goal was created/updated (ISO string)
 };
 
 export const SettingsContext = createContext();

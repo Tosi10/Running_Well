@@ -17,7 +17,7 @@ export default function HomeScreen() {
   const stats = getTotalStats();
   
   const goalProgress = settings.goalEnabled
-    ? getGoalProgress(settings.goalType, settings.goalDistance)
+    ? getGoalProgress(settings.goalType, settings.goalDistance, settings.goalStartDate)
     : null;
 
   // Check for goal completion and unlock achievement

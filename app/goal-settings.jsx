@@ -52,6 +52,7 @@ export default function GoalSettingsScreen() {
                 goalEnabled: false,
                 goalType: formData.goalType,
                 goalDistance: settings.goalDistance || 10,
+                goalStartDate: null, // Reset goal start date when disabling
               };
               await updateSettings(updates);
               router.back();
@@ -85,6 +86,7 @@ export default function GoalSettingsScreen() {
       goalEnabled: true,
       goalType: formData.goalType,
       goalDistance: distance,
+      goalStartDate: new Date().toISOString(), // Reset goal start date when updating goal
     };
 
     updateSettings(updates);

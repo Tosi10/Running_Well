@@ -120,7 +120,7 @@ export function RunProvider({ children }) {
     };
   }, [runs]);
 
-  const getGoalProgress = useCallback((goalType, goalDistance) => {
+  const getGoalProgress = useCallback((goalType, goalDistance, goalStartDate = null) => {
     if (!goalDistance || goalDistance <= 0) {
       return {
         current: 0,
@@ -130,20 +130,20 @@ export function RunProvider({ children }) {
     }
 
     const now = new Date();
-    let startDate;
+    let periodStartDate;
 
     switch (goalType) {
       case 'daily':
-        startDate = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-        startDate.setHours(0, 0, 0, 0);
+        periodStartDate = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+        periodStartDate.setHours(0, 0, 0, 0);
         break;
       case 'weekly':
-        startDate = new Date(now);
-        startDate.setDate(now.getDate() - now.getDay()); // Start of week (Sunday)
-        startDate.setHours(0, 0, 0, 0);
+        periodStartDate = new Date(now);
+        periodStartDate.setDate(now.getDate() - now.getDay()); // Start of week (Sunday)
+        periodStartDate.setHours(0, 0, 0, 0);
         break;
       case 'monthly':
-        startDate = new Date(now.getFullYear(), now.getMonth(), 1);
+        periodStartDate = new Date(now.getFullYear(), now.getMonth(), 1);
         break;
       default:
         return {
@@ -153,9 +153,18 @@ export function RunProvider({ children }) {
         };
     }
 
+    // Use goalStartDate if provided, otherwise use period start date
+    // This ensures we only count runs after the goal was created/updated
+    const startDate = goalStartDate ? new Date(goalStartDate) : periodStartDate;
+    
+    // Make sure we don't count runs before the goal was created
+    const effectiveStartDate = goalStartDate && new Date(goalStartDate) > periodStartDate 
+      ? new Date(goalStartDate) 
+      : periodStartDate;
+
     const relevantRuns = runs.filter(run => {
       const runDate = new Date(run.timestamp);
-      return runDate >= startDate;
+      return runDate >= effectiveStartDate;
     });
 
     const currentDistance = relevantRuns.reduce((sum, run) => sum + (run.distanceInMeters || 0), 0) / 1000; // Convert to km

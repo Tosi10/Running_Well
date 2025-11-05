@@ -140,6 +140,7 @@ export default function CurrentRunScreen() {
         <GoogleMapView 
           pathPoints={pathPoints} 
           isDark={isDark}
+          isTracking={isTracking}
           currentLocation={location?.coords ? {
             latitude: location.coords.latitude,
             longitude: location.coords.longitude,

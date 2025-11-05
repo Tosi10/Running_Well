@@ -26,6 +26,28 @@ export function useLocationTracking() {
 
   useEffect(() => {
     requestPermission();
+    
+    // Get current location immediately when component mounts (for map display)
+    const getInitialLocation = async () => {
+      try {
+        const { status } = await Location.getForegroundPermissionsAsync();
+        if (status === 'granted') {
+          const currentLocation = await Location.getCurrentPositionAsync({
+            accuracy: Location.Accuracy.Balanced,
+            timeout: 5000,
+          }).catch(() => null);
+          
+          if (currentLocation?.coords) {
+            setLocation(currentLocation);
+          }
+        }
+      } catch (error) {
+        console.log('Could not get initial location:', error);
+      }
+    };
+    
+    getInitialLocation();
+    
     return () => {
       stopTracking();
     };
@@ -149,24 +171,7 @@ export function useLocationTracking() {
       setPathPoints([]);
       lastLocation.current = null;
 
-      // Get initial location immediately
-      try {
-        const initialLocation = await Location.getCurrentPositionAsync({
-          accuracy: Location.Accuracy.BestForNavigation,
-        });
-        if (initialLocation?.coords) {
-          const initialPoint = {
-            latitude: initialLocation.coords.latitude,
-            longitude: initialLocation.coords.longitude,
-          };
-          setPathPoints([initialPoint]);
-          lastLocation.current = initialPoint;
-        }
-      } catch (error) {
-        console.log('Could not get initial location:', error);
-      }
-
-      // Start timer
+      // Start timer immediately (don't wait for location)
       timerInterval.current = setInterval(() => {
         if (startTime.current) {
           const elapsed = Math.floor((Date.now() - startTime.current) / 1000);
@@ -174,7 +179,13 @@ export function useLocationTracking() {
         }
       }, 1000);
 
-      // Start location tracking with optimized settings
+      // Get initial location quickly with timeout
+      const getInitialLocationPromise = Location.getCurrentPositionAsync({
+        accuracy: Location.Accuracy.Balanced, // Use Balanced for faster initial lock
+        timeout: 5000, // 5 second timeout
+      }).catch(() => null);
+
+      // Start location tracking immediately (don't wait for initial location)
       watchSubscription.current = await Location.watchPositionAsync(
         {
           // Use BestForNavigation for running (highest accuracy)
@@ -220,12 +231,26 @@ export function useLocationTracking() {
             }
             // If distance is too small, ignore (GPS noise)
           } else {
-            // First point
+            // First point - always add it
             setPathPoints([newPoint]);
             lastLocation.current = newPoint;
+            setLocation(location); // Ensure location state is set immediately
           }
         }
       );
+
+      // Try to get initial location (non-blocking)
+      getInitialLocationPromise.then((initialLocation) => {
+        if (initialLocation?.coords && !lastLocation.current) {
+          const initialPoint = {
+            latitude: initialLocation.coords.latitude,
+            longitude: initialLocation.coords.longitude,
+          };
+          setPathPoints([initialPoint]);
+          setLocation(initialLocation);
+          lastLocation.current = initialPoint;
+        }
+      });
     } catch (error) {
       console.error('Error starting tracking:', error);
       setIsTracking(false);
