@@ -12,11 +12,11 @@ export default function PersonalParametersScreen() {
   const { settings, updateSettings } = useSettings();
 
   const [formData, setFormData] = useState({
-    userName: settings.userName || '',
-    weight: settings.weight?.toString() || '',
-    height: settings.height?.toString() || '',
-    age: settings.age?.toString() || '',
-    gender: settings.gender || 'male',
+    userName: '',
+    weight: '',
+    height: '',
+    age: '',
+    gender: 'male',
   });
 
   const handleSave = () => {
