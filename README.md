@@ -1,50 +1,287 @@
-# Welcome to your Expo app 👋
+# 🏃 Running Well
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+Um aplicativo mobile moderno e completo para rastreamento de corridas desenvolvido com React Native e Expo.
 
-## Get started
+## 📱 Sobre o Projeto
 
-1. Install dependencies
+Running Well é um aplicativo de fitness focado em corrida que permite aos usuários rastrear suas corridas em tempo real usando GPS, definir metas de corrida (diárias, semanais ou mensais), acompanhar estatísticas detalhadas e conquistar achievements ao completar objetivos.
 
-   ```bash
-   npm install
-   ```
+### ✨ Funcionalidades Principais
 
-2. Start the app
+- **Rastreamento GPS em Tempo Real**
+  - Mapas interativos com Google Maps
+  - Seguimento automático da localização durante a corrida
+  - Visualização da rota percorrida
+  - Marcadores de início e fim da corrida
 
-   ```bash
-   npx expo start
-   ```
+- **Estatísticas Detalhadas**
+  - Distância total percorrida
+  - Tempo de corrida
+  - Ritmo médio (min/km)
+  - Velocidade média (km/h)
+  - Estatísticas semanais e mensais
+  - Melhor corrida registrada
 
-In the output, you'll find options to open the app in a
+- **Sistema de Metas**
+  - Metas diárias, semanais ou mensais
+  - Acompanhamento visual de progresso
+  - Notificações ao completar metas
+  - Reset automático ao criar nova meta
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
+- **Sistema de Conquistas**
+  - Achievements desbloqueados ao completar metas
+  - Histórico de conquistas
+  - Visualização de achievements por tipo
 
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
+- **Histórico de Corridas**
+  - Lista completa de todas as corridas
+  - Visualização detalhada de cada corrida
+  - Mapa da rota percorrida
+  - Estatísticas individuais por corrida
+  - Opção de deletar corridas
 
-## Get a fresh project
+- **Perfil do Usuário**
+  - Configuração de parâmetros pessoais (nome, peso, altura, idade, gênero)
+  - Configuração de metas
+  - Visualização de conquistas
 
-When you're ready, run:
+- **Interface Moderna**
+  - Suporte a tema claro/escuro automático
+  - Design responsivo e intuitivo
+  - Animações suaves
+  - Placeholder profissional durante carregamento do GPS
 
-```bash
-npm run reset-project
+## 🛠️ Tecnologias Utilizadas
+
+### Core
+- **React Native** 0.81.5
+- **Expo** ~54.0.22
+- **React** 19.1.0
+- **Expo Router** ~6.0.14 (Navegação baseada em arquivos)
+
+### Mapas e Localização
+- **react-native-maps** 1.20.1
+- **expo-location** ~19.0.7
+
+### Estilização
+- **NativeWind** ^4.1.23 (Tailwind CSS para React Native)
+- **Tailwind CSS** ^3.4.17
+
+### Armazenamento
+- **@react-native-async-storage/async-storage** 2.2.0
+
+### Navegação
+- **@react-navigation/native** ^7.1.8
+- **@react-navigation/bottom-tabs** ^7.4.0
+
+### Outras Bibliotecas
+- **expo-haptics** ~15.0.7 (Feedback tátil)
+- **react-native-reanimated** ~4.1.1 (Animações)
+- **react-native-gesture-handler** ~2.28.0 (Gestos)
+- **@expo/vector-icons** ^15.0.3 (Ícones)
+
+## 📁 Estrutura do Projeto
+
+```
+running_well/
+├── app/                          # Rotas da aplicação (Expo Router)
+│   ├── (tabs)/                   # Navegação por abas
+│   │   ├── index.jsx            # Tela inicial (Home)
+│   │   ├── history.jsx           # Histórico de corridas
+│   │   ├── stats.jsx            # Estatísticas
+│   │   ├── profile.jsx          # Perfil do usuário
+│   │   └── _layout.jsx          # Layout das abas
+│   ├── current-run.jsx          # Tela de corrida ativa
+│   ├── run-details.jsx         # Detalhes de uma corrida
+│   ├── goal-settings.jsx       # Configuração de metas
+│   ├── personal-parameters.jsx  # Parâmetros pessoais
+│   ├── achievements.jsx        # Conquistas
+│   └── _layout.jsx             # Layout raiz
+├── components/                   # Componentes reutilizáveis
+│   ├── GoogleMapView.jsx        # Componente do mapa
+│   └── ui/                      # Componentes de UI
+├── context/                      # Contextos React (Estado global)
+│   ├── RunContext.jsx          # Contexto de corridas
+│   ├── SettingsContext.jsx     # Contexto de configurações
+│   └── AchievementsContext.jsx # Contexto de conquistas
+├── hooks/                        # Hooks customizados
+│   ├── useLocationTracking.jsx # Hook de rastreamento GPS
+│   └── use-color-scheme.jsx    # Hook de tema
+├── assets/                       # Recursos estáticos
+│   └── images/                 # Imagens do app
+├── app.json                     # Configuração do Expo
+├── eas.json                     # Configuração do EAS Build
+└── package.json                 # Dependências do projeto
 ```
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+## 🚀 Como Começar
 
-## Learn more
+### Pré-requisitos
 
-To learn more about developing your project with Expo, look at the following resources:
+- Node.js (versão 18 ou superior)
+- npm ou yarn
+- Expo CLI (`npm install -g expo-cli`)
+- Conta no Expo (opcional, para builds)
+- Google Maps API Key (para mapas)
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+### Instalação
 
-## Join the community
+1. Clone o repositório:
+```bash
+git clone https://github.com/Tosi10/Running_Well.git
+cd Running_Well
+```
 
-Join our community of developers creating universal apps.
+2. Instale as dependências:
+```bash
+npm install
+```
 
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+3. Configure a Google Maps API Key:
+   - Obtenha uma chave em [Google Cloud Console](https://console.cloud.google.com/)
+   - Edite `app.json` e adicione sua chave:
+   ```json
+   "ios": {
+     "config": {
+       "googleMapsApiKey": "SUA_CHAVE_AQUI"
+     }
+   },
+   "android": {
+     "config": {
+       "googleMaps": {
+         "apiKey": "SUA_CHAVE_AQUI"
+       }
+     }
+   }
+   ```
+
+4. Inicie o servidor de desenvolvimento:
+```bash
+npx expo start
+```
+
+### Executando em Dispositivos
+
+#### Android
+```bash
+# Com emulador Android
+npx expo start --android
+
+# Ou escaneie o QR code com Expo Go
+```
+
+#### iOS
+```bash
+# Com simulador iOS (apenas macOS)
+npx expo start --ios
+
+# Ou escaneie o QR code com Expo Go
+```
+
+## 📦 Build e Deploy
+
+### Desenvolvimento
+
+Para testar em desenvolvimento:
+```bash
+npx expo start
+```
+
+### Build de Produção
+
+#### Android (APK)
+```bash
+# Build preview
+npx eas build --platform android --profile preview
+
+# Build production
+npx eas build --platform android --profile production
+```
+
+#### iOS (TestFlight)
+```bash
+# Build production
+npx eas build --platform ios --profile production
+
+# Submit para TestFlight
+npx eas submit --platform ios --profile production
+```
+
+### Configuração do EAS Build
+
+O projeto está configurado com EAS Build. Certifique-se de ter:
+- Conta Expo configurada
+- EAS CLI instalado (`npm install -g eas-cli`)
+- Login feito (`eas login`)
+
+## 🔧 Configurações
+
+### Permissões
+
+O app requer as seguintes permissões:
+
+- **Localização em primeiro plano** (obrigatório)
+- **Localização em segundo plano** (opcional, recomendado)
+
+### Bundle IDs
+
+- **iOS**: `com.runningwell.app`
+- **Android**: `com.runningwell.app`
+
+## 🎨 Funcionalidades Detalhadas
+
+### Rastreamento de Corrida
+
+- **Início/Pausa**: Controle total sobre o rastreamento
+- **Parada**: Opção de zerar corrida com confirmação
+- **Finalização**: Salva corrida no histórico
+- **Precisão**: Filtragem de ruído GPS e detecção de saltos
+
+### Sistema de Metas
+
+- **Tipos**: Diária, Semanal, Mensal
+- **Progresso Visual**: Barra de progresso em tempo real
+- **Reset Inteligente**: Ao criar nova meta, conta apenas corridas após a criação
+- **Conquistas**: Desbloqueio automático ao completar metas
+
+### Estatísticas
+
+- **Total**: Distância total, tempo total, número de corridas
+- **Semanal**: Estatísticas da semana atual
+- **Mensal**: Estatísticas do mês atual
+- **Melhor Corrida**: Maior distância registrada
+
+## 🐛 Troubleshooting
+
+### Problemas comuns
+
+**GPS não funciona:**
+- Verifique se as permissões de localização estão habilitadas
+- Teste em dispositivo físico (GPS não funciona bem em emuladores)
+- Verifique se a localização está ativada no dispositivo
+
+**Mapa não carrega:**
+- Verifique se a Google Maps API Key está configurada corretamente
+- Confirme que a chave tem permissões para Maps SDK
+- Verifique sua conexão com a internet
+
+**Build falha:**
+- Execute `npx expo install --fix` para corrigir dependências
+- Limpe o cache: `npx expo start -c`
+- Verifique se todas as configurações no `app.json` estão corretas
+
+## 📝 Licença
+
+Este projeto é privado e proprietário.
+
+## 👥 Contribuindo
+
+Este é um projeto pessoal. Para sugestões ou problemas, abra uma issue no repositório.
+
+## 📞 Contato
+
+Para dúvidas ou suporte, entre em contato através do repositório GitHub.
+
+---
+
+**Desenvolvido com ❤️ usando React Native e Expo**
