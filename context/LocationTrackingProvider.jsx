@@ -98,6 +98,16 @@ export function LocationTrackingProvider({ children }) {
       }
     }
 
+    // Always request background permission before starting tracking
+    try {
+      const { status: backgroundStatus } = await Location.requestBackgroundPermissionsAsync();
+      if (backgroundStatus !== 'granted') {
+        console.warn('Background location permission not granted. Tracking may stop when app goes to background.');
+      }
+    } catch (error) {
+      console.log('Background permission request:', error);
+    }
+
     try {
       const enabled = await Location.hasServicesEnabledAsync();
       if (!enabled) {
@@ -122,9 +132,14 @@ export function LocationTrackingProvider({ children }) {
         watchSubscription.current = await Location.watchPositionAsync(
           {
             accuracy: Location.Accuracy.BestForNavigation,
-            timeInterval: 2000,
-            distanceInterval: 5,
+            timeInterval: 1000,
+            distanceInterval: 1,
             mayShowUserSettingsDialog: true,
+            foregroundService: {
+              notificationTitle: "Running Well",
+              notificationBody: "Rastreando sua corrida",
+              notificationColor: "#4CAF50",
+            },
           },
           (location) => {
             if (!location?.coords) return;
@@ -187,9 +202,14 @@ export function LocationTrackingProvider({ children }) {
       watchSubscription.current = await Location.watchPositionAsync(
         {
           accuracy: Location.Accuracy.BestForNavigation,
-          timeInterval: 2000,
-          distanceInterval: 5,
+          timeInterval: 1000,
+          distanceInterval: 1,
           mayShowUserSettingsDialog: true,
+          foregroundService: {
+            notificationTitle: "Running Well",
+            notificationBody: "Rastreando sua corrida",
+            notificationColor: "#4CAF50",
+          },
         },
         (location) => {
           if (!location?.coords) return;
