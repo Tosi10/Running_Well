@@ -11,8 +11,13 @@ Running Well é um aplicativo de fitness focado em corrida que permite aos usuá
 - **Rastreamento GPS em Tempo Real**
   - Mapas interativos com Google Maps
   - Seguimento automático da localização durante a corrida
-  - Visualização da rota percorrida
+  - Rastreamento contínuo em segundo plano (background)
+  - Funciona mesmo com tela bloqueada ou app em background
+  - Foreground service no Android para rastreamento confiável
+  - Visualização da rota percorrida em tempo real
   - Marcadores de início e fim da corrida
+  - Placeholder profissional durante inicialização do GPS
+  - Filtragem inteligente de ruído GPS e detecção de saltos
 
 - **Estatísticas Detalhadas**
   - Distância total percorrida
@@ -42,6 +47,7 @@ Running Well é um aplicativo de fitness focado em corrida que permite aos usuá
 
 - **Perfil do Usuário**
   - Configuração de parâmetros pessoais (nome, peso, altura, idade, gênero)
+  - Interface totalmente em português
   - Configuração de metas
   - Visualização de conquistas
 
@@ -50,6 +56,9 @@ Running Well é um aplicativo de fitness focado em corrida que permite aos usuá
   - Design responsivo e intuitivo
   - Animações suaves
   - Placeholder profissional durante carregamento do GPS
+  - Navegação livre durante corrida ativa (rastreamento continua em background)
+  - Banner de corrida ativa na tela inicial
+  - Layout otimizado para evitar sobreposição com botões do sistema
 
 ## 🛠️ Tecnologias Utilizadas
 
@@ -103,9 +112,10 @@ running_well/
 ├── context/                      # Contextos React (Estado global)
 │   ├── RunContext.jsx          # Contexto de corridas
 │   ├── SettingsContext.jsx     # Contexto de configurações
-│   └── AchievementsContext.jsx # Contexto de conquistas
+│   ├── AchievementsContext.jsx # Contexto de conquistas
+│   └── LocationTrackingProvider.jsx # Contexto de rastreamento GPS (global)
 ├── hooks/                        # Hooks customizados
-│   ├── useLocationTracking.jsx # Hook de rastreamento GPS
+│   ├── useLocationTracking.jsx # Hook que consome LocationTrackingProvider
 │   └── use-color-scheme.jsx    # Hook de tema
 ├── assets/                       # Recursos estáticos
 │   └── images/                 # Imagens do app
@@ -220,22 +230,52 @@ O projeto está configurado com EAS Build. Certifique-se de ter:
 
 O app requer as seguintes permissões:
 
-- **Localização em primeiro plano** (obrigatório)
-- **Localização em segundo plano** (opcional, recomendado)
+#### iOS
+- **NSLocationWhenInUseUsageDescription**: Localização durante o uso do app
+- **NSLocationAlwaysAndWhenInUseUsageDescription**: Localização sempre (incluindo background)
+- **NSLocationAlwaysUsageDescription**: Localização em background
+- **UIBackgroundModes**: `["location"]` - Permite rastreamento em segundo plano
+
+#### Android
+- **ACCESS_FINE_LOCATION**: Localização precisa (GPS)
+- **ACCESS_COARSE_LOCATION**: Localização aproximada
+- **ACCESS_BACKGROUND_LOCATION**: Localização em segundo plano
+- **FOREGROUND_SERVICE**: Serviço em primeiro plano
+- **FOREGROUND_SERVICE_LOCATION**: Serviço de localização em primeiro plano
 
 ### Bundle IDs
 
 - **iOS**: `com.runningwell.app`
 - **Android**: `com.runningwell.app`
 
+### Configurações de Rastreamento GPS
+
+O app utiliza configurações otimizadas para rastreamento preciso:
+
+- **Precisão**: `Location.Accuracy.BestForNavigation` - Máxima precisão para navegação
+- **Intervalo de Tempo**: 1000ms (1 segundo) - Atualizações frequentes
+- **Intervalo de Distância**: 1 metro - Novo ponto a cada metro percorrido
+- **Filtragem de Ruído**: 
+  - Mínimo: 0.5 metros (ignora micro-movimentos)
+  - Máximo: 100 metros (ignora saltos de GPS)
+- **Foreground Service (Android)**: Notificação persistente durante rastreamento
+
 ## 🎨 Funcionalidades Detalhadas
 
 ### Rastreamento de Corrida
 
 - **Início/Pausa**: Controle total sobre o rastreamento
-- **Parada**: Opção de zerar corrida com confirmação
-- **Finalização**: Salva corrida no histórico
-- **Precisão**: Filtragem de ruído GPS e detecção de saltos
+- **Rastreamento em Background**: Continua funcionando mesmo quando:
+  - O app está em segundo plano
+  - A tela está bloqueada
+  - O usuário navega para outras telas do app
+- **Parada**: Opção de zerar corrida com confirmação (só funciona se houver corrida ativa)
+- **Finalização**: Salva corrida no histórico com todos os dados
+- **Precisão**: 
+  - Filtragem inteligente de ruído GPS
+  - Detecção e ignorância de saltos de GPS
+  - Cálculo preciso de distância usando fórmula de Haversine
+- **Estado Persistente**: O estado da corrida é mantido globalmente, permitindo navegação livre
 
 ### Sistema de Metas
 
@@ -251,24 +291,64 @@ O app requer as seguintes permissões:
 - **Mensal**: Estatísticas do mês atual
 - **Melhor Corrida**: Maior distância registrada
 
+## 🆕 Melhorias Recentes
+
+### Versão Atual
+
+- ✅ **Rastreamento GPS Otimizado**
+  - Refatoração completa do sistema de rastreamento para contexto global
+  - Suporte completo para rastreamento em background (iOS e Android)
+  - Foreground service no Android para rastreamento confiável
+  - Filtragem aprimorada de ruído GPS
+  - Otimização de bateria mantendo precisão
+
+- ✅ **Melhorias de UX/UI**
+  - Interface totalmente traduzida para português
+  - Placeholder profissional durante carregamento do GPS
+  - Banner de corrida ativa na tela inicial
+  - Navegação livre durante corrida (rastreamento continua)
+  - Layout otimizado para diferentes tamanhos de tela
+  - Ajuste automático de zoom no mapa para visualização de rotas salvas
+
+- ✅ **Sistema de Conquistas**
+  - Desbloqueio automático ao completar metas
+  - Histórico completo de conquistas
+  - Timestamps de desbloqueio
+
+- ✅ **Correções de Bugs**
+  - Correção do toggle de meta em goal-settings
+  - Reset correto de progresso ao criar nova meta
+  - Botão de parar só funciona quando há corrida ativa
+  - Limpeza de permissões duplicadas no app.json
+
 ## 🐛 Troubleshooting
 
 ### Problemas comuns
 
-**GPS não funciona:**
+**GPS não funciona ou para após alguns minutos:**
 - Verifique se as permissões de localização estão habilitadas
+- No Android, certifique-se de permitir "Localização em segundo plano"
+- No iOS, permita "Sempre" quando solicitado
 - Teste em dispositivo físico (GPS não funciona bem em emuladores)
 - Verifique se a localização está ativada no dispositivo
+- Reinicie o app se o rastreamento parar
 
-**Mapa não carrega:**
+**Mapa não carrega ou demora muito:**
 - Verifique se a Google Maps API Key está configurada corretamente
-- Confirme que a chave tem permissões para Maps SDK
+- Confirme que a chave tem permissões para Maps SDK (Android e iOS)
 - Verifique sua conexão com a internet
+- Aguarde alguns segundos na primeira inicialização (GPS precisa de tempo)
+
+**Rastreamento para quando app vai para background:**
+- No Android: Verifique se a permissão de "Localização em segundo plano" foi concedida
+- No iOS: Certifique-se de ter selecionado "Sempre" nas configurações de localização
+- Verifique se o foreground service está funcionando (notificação deve aparecer no Android)
 
 **Build falha:**
 - Execute `npx expo install --fix` para corrigir dependências
 - Limpe o cache: `npx expo start -c`
 - Verifique se todas as configurações no `app.json` estão corretas
+- Para iOS: Certifique-se de que o build number foi incrementado
 
 ## 📝 Licença
 

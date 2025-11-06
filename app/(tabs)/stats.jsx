@@ -69,6 +69,14 @@ export default function StatsScreen() {
               </Text>
             </View>
           </View>
+          {weeklyStats.calories > 0 && (
+            <View className="flex-row items-center justify-center pt-2 border-t border-gray-300/20">
+              <Ionicons name="flame" size={16} color="#FF6B35" />
+              <Text className={`text-lg font-psemibold ml-2 ${isDark ? 'text-white' : 'text-black'}`}>
+                {weeklyStats.calories} kcal
+              </Text>
+            </View>
+          )}
         </View>
 
         {/* All Time Stats */}
@@ -126,6 +134,20 @@ export default function StatsScreen() {
                 </Text>
               </View>
             </View>
+
+            {totalStats.totalCalories > 0 && (
+              <View className={`mt-4 p-4 rounded-xl ${isDark ? 'bg-orange-500/20 border border-orange-500/30' : 'bg-orange-100 border border-orange-200'}`}>
+                <View className="flex-row items-center justify-center">
+                  <Ionicons name="flame" size={20} color="#FF6B35" />
+                  <Text className={`text-2xl font-pbold ml-3 ${isDark ? 'text-white' : 'text-black'}`}>
+                    {totalStats.totalCalories.toLocaleString('pt-BR')} kcal
+                  </Text>
+                </View>
+                <Text className={`text-sm text-center mt-2 ${isDark ? 'text-gray-100' : 'text-gray-400'}`}>
+                  Total de calorias queimadas
+                </Text>
+              </View>
+            )}
 
             {totalStats.bestRun && (
               <View className={`mt-4 p-4 rounded-xl ${isDark ? 'bg-primary-200' : 'bg-primary/20'}`}>

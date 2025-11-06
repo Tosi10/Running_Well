@@ -2,7 +2,7 @@ import { IconSymbol } from '@/components/ui/icon-symbol';
 import { useSettings } from '@/context/SettingsContext';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import { useRouter } from 'expo-router';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Alert, ScrollView, Text, TextInput, TouchableOpacity, View } from 'react-native';
 
 export default function PersonalParametersScreen() {
@@ -19,15 +19,41 @@ export default function PersonalParametersScreen() {
     gender: 'male',
   });
 
+  // Load saved settings when component mounts
+  useEffect(() => {
+    if (settings) {
+      setFormData({
+        userName: settings.userName && settings.userName !== 'Nome do Usuário' ? settings.userName : '',
+        weight: settings.weight ? settings.weight.toString() : '',
+        height: settings.height ? settings.height.toString() : '',
+        age: settings.age ? settings.age.toString() : '',
+        gender: settings.gender || 'male',
+      });
+      console.log('Carregando parâmetros salvos:', {
+        weight: settings.weight,
+        height: settings.height,
+        age: settings.age,
+        gender: settings.gender,
+      });
+    }
+  }, [settings]);
+
   const handleSave = () => {
+    // Parse and validate numeric values
+    const weight = formData.weight ? parseFloat(formData.weight) : null;
+    const height = formData.height ? parseFloat(formData.height) : null;
+    const age = formData.age ? parseInt(formData.age) : null;
+    
+    // Use provided values or fallback to current settings or defaults
     const updates = {
       userName: formData.userName || 'Nome do Usuário',
-      weight: parseFloat(formData.weight) || settings.weight,
-      height: parseFloat(formData.height) || settings.height,
-      age: parseInt(formData.age) || settings.age,
-      gender: formData.gender,
+      weight: weight && !isNaN(weight) && weight > 0 ? weight : (settings.weight || 70),
+      height: height && !isNaN(height) && height > 0 ? height : (settings.height || 170),
+      age: age && !isNaN(age) && age > 0 ? age : (settings.age || 30),
+      gender: formData.gender || 'male',
     };
 
+    console.log('Salvando parâmetros pessoais:', updates);
     updateSettings(updates);
     Alert.alert('Sucesso', 'Parâmetros pessoais salvos!', [
       { text: 'OK', onPress: () => router.back() },

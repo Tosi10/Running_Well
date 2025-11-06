@@ -2,9 +2,12 @@ import { GoogleMapView } from '@/components/GoogleMapView';
 import { IconSymbol } from '@/components/ui/icon-symbol';
 import { useLocationTracking } from '@/context/LocationTrackingProvider';
 import { useRuns } from '@/context/RunContext';
+import { useSettings } from '@/context/SettingsContext';
 import { useColorScheme } from '@/hooks/use-color-scheme';
+import { calculateRunCalories } from '@/utils/calories';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
+import { useMemo } from 'react';
 import { Alert, Text, TouchableOpacity, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
@@ -15,6 +18,7 @@ export default function CurrentRunScreen() {
   const insets = useSafeAreaInsets();
   
   const { saveRun } = useRuns();
+  const { settings } = useSettings();
   const {
     isTracking,
     distance,
@@ -26,6 +30,35 @@ export default function CurrentRunScreen() {
     resetRun,
     hasPermission,
   } = useLocationTracking();
+
+  // Calculate calories burned in real-time
+  const caloriesData = useMemo(() => {
+    if (time === 0 || distance === 0) {
+      return { total: 0, exercise: 0, met: 0, speed: 0 };
+    }
+    
+    // Get values with fallbacks
+    const weight = settings.weight || 70;
+    const height = settings.height || 170;
+    const age = settings.age || 30;
+    const gender = settings.gender || 'male';
+    
+    // Log for debugging
+    if (time > 0 && distance > 0) {
+      console.log('Calculando calorias com:', { weight, height, age, gender, distance, time });
+    }
+    
+    const durationMinutes = time / 60;
+    return calculateRunCalories(
+      distance,
+      durationMinutes,
+      weight,
+      height,
+      age,
+      gender,
+      false // Only exercise calories, not including BMR
+    );
+  }, [distance, time, settings.weight, settings.height, settings.age, settings.gender]);
 
   const formatTime = (seconds) => {
     const hrs = Math.floor(seconds / 3600);
@@ -106,14 +139,25 @@ export default function CurrentRunScreen() {
           {
             text: 'Salvar',
             onPress: async () => {
-              const run = {
-                id: Date.now().toString(),
-                distanceInMeters: 0,
-                durationInMillis: time * 1000,
-                timestamp: new Date().toISOString(),
-                pathPoints: pathPoints,
-                avgSpeedInKMH: 0,
-              };
+            const calories = calculateRunCalories(
+              0,
+              time / 60,
+              settings.weight || 70,
+              settings.height || 170,
+              settings.age || 30,
+              settings.gender || 'male',
+              false
+            );
+            
+            const run = {
+              id: Date.now().toString(),
+              distanceInMeters: 0,
+              durationInMillis: time * 1000,
+              timestamp: new Date().toISOString(),
+              pathPoints: pathPoints,
+              avgSpeedInKMH: 0,
+              caloriesBurned: calories.total,
+            };
               await saveRun(run);
               resetRun();
               router.back();
@@ -132,6 +176,16 @@ export default function CurrentRunScreen() {
         {
           text: 'Salvar',
           onPress: async () => {
+            const calories = calculateRunCalories(
+              distance,
+              time / 60,
+              settings.weight || 70,
+              settings.height || 170,
+              settings.age || 30,
+              settings.gender || 'male',
+              false
+            );
+            
             const run = {
               id: Date.now().toString(),
               distanceInMeters: distanceInMeters,
@@ -141,6 +195,7 @@ export default function CurrentRunScreen() {
               avgSpeedInKMH: time > 0 && distance > 0 
                 ? parseFloat((distance / (time / 3600)).toFixed(2)) 
                 : 0,
+              caloriesBurned: calories.total,
             };
             await saveRun(run);
             resetRun();
@@ -184,34 +239,47 @@ export default function CurrentRunScreen() {
         className={`mx-6 rounded-3xl p-6 border ${isDark ? 'bg-gray-200 border-gray-300/30' : 'bg-white border-gray-300'} shadow-lg`}
         style={{ marginBottom: Math.max(insets.bottom, 16) }}>
         {/* Main Stats */}
-        <View className="flex-row justify-around mb-6">
-          <View className="items-center">
+        <View className="flex-row justify-around mb-4">
+          <View className="items-center flex-1">
             <Text className={`text-xs mb-2 ${isDark ? 'text-gray-100' : 'text-gray-400'}`}>
               DISTÂNCIA
             </Text>
-            <Text className={`text-3xl font-pbold ${isDark ? 'text-white' : 'text-black'}`}>
+            <Text className={`text-2xl font-pbold ${isDark ? 'text-white' : 'text-black'}`}>
               {distance.toFixed(2)} km
             </Text>
           </View>
-          <View className="items-center">
+          <View className="items-center flex-1">
             <View className="flex-row items-center mb-2">
               <Ionicons name="time" size={16} color={isDark ? '#918F9A' : '#777680'} />
               <Text className={`text-xs ml-1 ${isDark ? 'text-gray-100' : 'text-gray-400'}`}>
                 TEMPO
               </Text>
             </View>
-            <Text className={`text-3xl font-pbold ${isDark ? 'text-white' : 'text-black'}`}>
+            <Text className={`text-2xl font-pbold ${isDark ? 'text-white' : 'text-black'}`}>
               {formatTime(time)}
             </Text>
           </View>
-          <View className="items-center">
+          <View className="items-center flex-1">
             <Text className={`text-xs mb-2 ${isDark ? 'text-gray-100' : 'text-gray-400'}`}>
               RITMO
             </Text>
-            <Text className={`text-3xl font-pbold ${isDark ? 'text-white' : 'text-black'}`}>
+            <Text className={`text-2xl font-pbold ${isDark ? 'text-white' : 'text-black'}`}>
               {formatPace()}
             </Text>
           </View>
+        </View>
+
+        {/* Calories Row */}
+        <View className="flex-row items-center justify-center mb-6 pb-4 border-b border-gray-300/20">
+          <Ionicons name="flame" size={20} color="#FF6B35" />
+          <Text className={`text-lg font-psemibold ml-2 ${isDark ? 'text-white' : 'text-black'}`}>
+            {caloriesData.total} kcal
+          </Text>
+          {time > 0 && caloriesData.total > 0 && (
+            <Text className={`text-sm ml-2 ${isDark ? 'text-gray-100' : 'text-gray-400'}`}>
+              ({Math.round((caloriesData.total / (time / 60)) * 10) / 10} kcal/min)
+            </Text>
+          )}
         </View>
 
         {/* Control Buttons */}

@@ -56,6 +56,12 @@ export function SettingsProvider({ children }) {
       const updatedSettings = { ...settings, ...newSettings };
       setSettings(updatedSettings);
       await AsyncStorage.setItem(SETTINGS_STORAGE_KEY, JSON.stringify(updatedSettings));
+      console.log('✅ Settings salvos no AsyncStorage:', {
+        weight: updatedSettings.weight,
+        height: updatedSettings.height,
+        age: updatedSettings.age,
+        gender: updatedSettings.gender,
+      });
     } catch (error) {
       console.error('Error saving settings:', error);
     }

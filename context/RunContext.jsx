@@ -61,6 +61,7 @@ export function RunProvider({ children }) {
     const avgSpeed = totalRuns > 0 
       ? runs.reduce((sum, run) => sum + (run.avgSpeedInKMH || 0), 0) / totalRuns 
       : 0;
+    const totalCalories = runs.reduce((sum, run) => sum + (run.caloriesBurned || 0), 0);
     
     // Find best run (longest distance)
     const bestRun = runs.length > 0 
@@ -74,6 +75,7 @@ export function RunProvider({ children }) {
       totalTime: Math.floor(totalTime / 1000),
       totalRuns,
       avgSpeed: avgSpeed.toFixed(1),
+      totalCalories,
       bestRun,
     };
   }, [runs]);
@@ -92,11 +94,13 @@ export function RunProvider({ children }) {
     const weeklyDistance = weeklyRuns.reduce((sum, run) => sum + (run.distanceInMeters || 0), 0);
     const weeklyTime = weeklyRuns.reduce((sum, run) => sum + (run.durationInMillis || 0), 0);
     const weeklyCount = weeklyRuns.length;
+    const weeklyCalories = weeklyRuns.reduce((sum, run) => sum + (run.caloriesBurned || 0), 0);
 
     return {
       distance: (weeklyDistance / 1000).toFixed(2),
       time: Math.floor(weeklyTime / 1000),
       runs: weeklyCount,
+      calories: weeklyCalories,
     };
   }, [runs]);
 
@@ -112,11 +116,13 @@ export function RunProvider({ children }) {
     const monthlyDistance = monthlyRuns.reduce((sum, run) => sum + (run.distanceInMeters || 0), 0);
     const monthlyTime = monthlyRuns.reduce((sum, run) => sum + (run.durationInMillis || 0), 0);
     const monthlyCount = monthlyRuns.length;
+    const monthlyCalories = monthlyRuns.reduce((sum, run) => sum + (run.caloriesBurned || 0), 0);
 
     return {
       distance: (monthlyDistance / 1000).toFixed(2),
       time: Math.floor(monthlyTime / 1000),
       runs: monthlyCount,
+      calories: monthlyCalories,
     };
   }, [runs]);
 

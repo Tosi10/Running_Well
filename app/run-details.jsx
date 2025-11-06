@@ -39,9 +39,11 @@ export default function RunDetailsScreen() {
   };
 
   const formatPace = () => {
-    if (run.distanceInMeters === 0 || run.durationInMillis === 0) return '--:--';
-    const distanceKm = run.distanceInMeters / 1000;
-    const timeSeconds = run.durationInMillis / 1000;
+    const distanceInMeters = run.distanceInMeters || 0;
+    const durationInMillis = run.durationInMillis || 0;
+    if (distanceInMeters === 0 || durationInMillis === 0) return '--:--';
+    const distanceKm = distanceInMeters / 1000;
+    const timeSeconds = durationInMillis / 1000;
     const paceInSeconds = timeSeconds / distanceKm;
     const mins = Math.floor(paceInSeconds / 60);
     const secs = Math.floor(paceInSeconds % 60);
@@ -109,7 +111,7 @@ export default function RunDetailsScreen() {
               </Text>
             </View>
             <Text className={`text-2xl font-pbold ${isDark ? 'text-white' : 'text-black'}`}>
-              {(run.distanceInMeters / 1000).toFixed(2)} km
+              {run.distanceInMeters ? (run.distanceInMeters / 1000).toFixed(2) : '0.00'} km
             </Text>
           </View>
           
@@ -121,12 +123,12 @@ export default function RunDetailsScreen() {
               </Text>
             </View>
             <Text className={`text-2xl font-pbold ${isDark ? 'text-white' : 'text-black'}`}>
-              {formatTime(Math.floor(run.durationInMillis / 1000))}
+              {formatTime(run.durationInMillis ? Math.floor(run.durationInMillis / 1000) : 0)}
             </Text>
           </View>
         </View>
 
-        <View className="flex-row gap-4">
+        <View className="flex-row gap-4 mb-4">
           <View className={`flex-1 rounded-2xl p-4 border ${isDark ? 'bg-gray-200 border-gray-300/30' : 'bg-gray-100 border-gray-300'}`}>
             <View className="flex-row items-center mb-2">
               <Ionicons name="speedometer" size={16} color={isDark ? '#918F9A' : '#777680'} />
@@ -150,10 +152,25 @@ export default function RunDetailsScreen() {
               </Text>
             </View>
             <Text className={`text-2xl font-pbold ${isDark ? 'text-white' : 'text-black'}`}>
-              {run.avgSpeedInKMH > 0 ? run.avgSpeedInKMH.toFixed(1) : '--'} km/h
+              {run.avgSpeedInKMH && run.avgSpeedInKMH > 0 ? run.avgSpeedInKMH.toFixed(1) : '--'} km/h
             </Text>
           </View>
         </View>
+
+        {/* Calories Card */}
+        {run.caloriesBurned !== undefined && run.caloriesBurned !== null && run.caloriesBurned > 0 && (
+          <View className={`rounded-2xl p-4 border ${isDark ? 'bg-gray-200 border-gray-300/30' : 'bg-gray-100 border-gray-300'}`}>
+            <View className="flex-row items-center justify-center">
+              <Ionicons name="flame" size={24} color="#FF6B35" />
+              <Text className={`text-2xl font-pbold ml-3 ${isDark ? 'text-white' : 'text-black'}`}>
+                {String(run.caloriesBurned)} kcal
+              </Text>
+            </View>
+            <Text className={`text-sm text-center mt-2 ${isDark ? 'text-gray-100' : 'text-gray-400'}`}>
+              Calorias queimadas
+            </Text>
+          </View>
+        )}
       </View>
 
       {/* Date & Time Info */}

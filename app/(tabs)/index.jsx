@@ -187,26 +187,45 @@ export default function HomeScreen() {
             </TouchableOpacity>
           </View>
           {recentRuns.length > 0 ? (
-            recentRuns.map((run) => (
-              <TouchableOpacity
-                key={run.id}
-                className={`rounded-2xl p-4 mb-3 border ${isDark ? 'bg-gray-200 border-gray-300/30' : 'bg-gray-100 border-gray-300'}`}
-                onPress={() => router.push(`/run-details?runId=${run.id}`)}>
-                <View className="flex-row justify-between items-center">
-                  <View className="flex-1">
-                    <Text className={`text-base font-psemibold mb-1 ${isDark ? 'text-white' : 'text-black'}`}>
-                      {(run.distanceInMeters / 1000).toFixed(2)} km
-                    </Text>
-                    <Text className={`text-sm ${isDark ? 'text-gray-100' : 'text-gray-400'}`}>
-                      {new Date(run.timestamp).toLocaleDateString('pt-BR')}
+            recentRuns.map((run) => {
+              const distanceKm = run.distanceInMeters ? (run.distanceInMeters / 1000).toFixed(2) : '0.00';
+              const durationSeconds = run.durationInMillis ? Math.floor(run.durationInMillis / 1000) : 0;
+              const dateStr = run.timestamp 
+                ? new Date(run.timestamp).toLocaleDateString('pt-BR')
+                : 'Data não disponível';
+              const caloriesBurned = run.caloriesBurned && run.caloriesBurned > 0 ? run.caloriesBurned : null;
+              
+              return (
+                <TouchableOpacity
+                  key={run.id}
+                  className={`rounded-2xl p-4 mb-3 border ${isDark ? 'bg-gray-200 border-gray-300/30' : 'bg-gray-100 border-gray-300'}`}
+                  onPress={() => router.push(`/run-details?runId=${run.id}`)}>
+                  <View className="flex-row justify-between items-center">
+                    <View className="flex-1">
+                      <Text className={`text-base font-psemibold mb-1 ${isDark ? 'text-white' : 'text-black'}`}>
+                        {distanceKm} km
+                      </Text>
+                      <View className="flex-row items-center flex-wrap">
+                        <Text className={`text-sm ${isDark ? 'text-gray-100' : 'text-gray-400'}`}>
+                          {dateStr}
+                        </Text>
+                        {caloriesBurned && (
+                          <View className="flex-row items-center ml-3">
+                            <Ionicons name="flame" size={12} color="#FF6B35" />
+                            <Text className={`text-xs ml-1 ${isDark ? 'text-gray-100' : 'text-gray-400'}`}>
+                              {caloriesBurned} kcal
+                            </Text>
+                          </View>
+                        )}
+                      </View>
+                    </View>
+                    <Text className={`text-base font-pregular ${isDark ? 'text-gray-100' : 'text-gray-400'}`}>
+                      {formatTime(durationSeconds)}
                     </Text>
                   </View>
-                  <Text className={`text-base font-pregular ${isDark ? 'text-gray-100' : 'text-gray-400'}`}>
-                    {formatTime(Math.floor(run.durationInMillis / 1000))}
-                  </Text>
-                </View>
-              </TouchableOpacity>
-            ))
+                </TouchableOpacity>
+              );
+            })
           ) : (
             <View className={`rounded-2xl p-4 border ${isDark ? 'bg-gray-200 border-gray-300/30' : 'bg-gray-100 border-gray-300'}`}>
               <Text className={`text-center ${isDark ? 'text-gray-100' : 'text-gray-400'}`}>
