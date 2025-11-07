@@ -35,7 +35,6 @@ export default function RootLayout() {
                     <Stack.Screen name="goal-settings" options={{ headerShown: false, presentation: 'modal' }} />
                     <Stack.Screen name="run-details" options={{ headerShown: false, presentation: 'card' }} />
                     <Stack.Screen name="achievements" options={{ headerShown: false, presentation: 'modal' }} />
-                    <Stack.Screen name="debug-logs" options={{ headerShown: false, presentation: 'modal' }} />
                     <Stack.Screen name="modal" options={{ presentation: 'modal', title: 'Modal' }} />
                   </Stack>
                 <StatusBar style="auto" />

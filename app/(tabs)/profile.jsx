@@ -71,18 +71,6 @@ export default function ProfileScreen() {
             <IconSymbol name="chevron.right" size={20} color={isDark ? '#918F9A' : '#777680'} />
           </TouchableOpacity>
           
-          <TouchableOpacity 
-            className="flex-row items-center px-6 py-4 border-b border-gray-300/20"
-            onPress={() => router.push('/debug-logs')}>
-            <View className="w-10 h-10 rounded-full bg-primary/20 items-center justify-center mr-4">
-              <Ionicons name="bug-outline" size={20} color={isDark ? '#BFC2FF' : '#4C52BF'} />
-            </View>
-            <Text className={`flex-1 text-base font-pregular ${isDark ? 'text-white' : 'text-black'}`}>
-              Logs de Debug
-            </Text>
-            <IconSymbol name="chevron.right" size={20} color={isDark ? '#918F9A' : '#777680'} />
-          </TouchableOpacity>
-          
           <TouchableOpacity className="flex-row items-center px-6 py-4">
             <View className="w-10 h-10 rounded-full bg-primary/20 items-center justify-center mr-4">
               <IconSymbol name="gearshape.fill" size={20} color={isDark ? '#BFC2FF' : '#4C52BF'} />
