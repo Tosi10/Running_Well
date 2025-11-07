@@ -5,6 +5,9 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 import 'react-native-reanimated';
 import '../global.css';
 
+// Importar task de background ANTES de tudo (deve ser registrada antes do app iniciar)
+import '../tasks/backgroundLocationTask';
+
 import { RunProvider } from '@/context/RunContext';
 import { SettingsProvider } from '@/context/SettingsContext';
 import { AchievementsProvider } from '@/context/AchievementsContext';
@@ -32,6 +35,7 @@ export default function RootLayout() {
                     <Stack.Screen name="goal-settings" options={{ headerShown: false, presentation: 'modal' }} />
                     <Stack.Screen name="run-details" options={{ headerShown: false, presentation: 'card' }} />
                     <Stack.Screen name="achievements" options={{ headerShown: false, presentation: 'modal' }} />
+                    <Stack.Screen name="debug-logs" options={{ headerShown: false, presentation: 'modal' }} />
                     <Stack.Screen name="modal" options={{ presentation: 'modal', title: 'Modal' }} />
                   </Stack>
                 <StatusBar style="auto" />

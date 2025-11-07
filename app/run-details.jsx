@@ -1,4 +1,5 @@
 import { GoogleMapView } from '@/components/GoogleMapView';
+import { PaceChart } from '@/components/PaceChart';
 import { IconSymbol } from '@/components/ui/icon-symbol';
 import { useRuns } from '@/context/RunContext';
 import { useColorScheme } from '@/hooks/use-color-scheme';
@@ -99,6 +100,13 @@ export default function RunDetailsScreen() {
           isDark={isDark}
         />
       </View>
+
+      {/* Pace Chart */}
+      {run.paceData && run.paceData.length > 0 && (
+        <View className="px-6 mb-6">
+          <PaceChart paceData={run.paceData} isDark={isDark} />
+        </View>
+      )}
 
       {/* Stats Cards */}
       <View className="px-6 mb-6">

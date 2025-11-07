@@ -24,6 +24,8 @@ export default function CurrentRunScreen() {
     distance,
     time,
     pathPoints,
+    paceData,
+    getAllPathPoints,
     location,
     startTracking,
     pauseTracking,
@@ -149,14 +151,48 @@ export default function CurrentRunScreen() {
               false
             );
             
+            // Get all path points, with multiple fallbacks to ensure we always save points
+            let finalPathPoints = pathPoints || []; // Start with state (most reliable)
+            
+            if (getAllPathPoints) {
+              try {
+                const allPathPoints = getAllPathPoints();
+                // Use getAllPathPoints if it has more points than state
+                if (allPathPoints && allPathPoints.length > finalPathPoints.length) {
+                  finalPathPoints = allPathPoints;
+                }
+              } catch (error) {
+                console.error('Erro ao obter todos os pathPoints:', error);
+                // Fallback to state pathPoints
+              }
+            }
+            
+            // Final safety check - ensure we have valid array
+            if (!finalPathPoints || !Array.isArray(finalPathPoints) || finalPathPoints.length === 0) {
+              finalPathPoints = pathPoints || [];
+            }
+            
+            // Ensure we have at least one pace data point if we have time (even without distance)
+            let finalPaceData = paceData || [];
+            if (finalPaceData.length === 0 && time > 0) {
+              // If no distance, we can't calculate pace, but we can still save a placeholder
+              // This ensures the graph component knows there was a run
+              finalPaceData = [{
+                time: time,
+                distance: 0,
+                pace: 0, // Will be handled by graph component
+              }];
+            }
+            
             const run = {
               id: Date.now().toString(),
               distanceInMeters: 0,
               durationInMillis: time * 1000,
               timestamp: new Date().toISOString(),
-              pathPoints: pathPoints,
+              pathPoints: finalPathPoints,
               avgSpeedInKMH: 0,
               caloriesBurned: calories.total,
+              paceData: finalPaceData,
             };
               await saveRun(run);
               resetRun();
@@ -186,16 +222,52 @@ export default function CurrentRunScreen() {
               false
             );
             
+            // Get all path points, with multiple fallbacks to ensure we always save points
+            let finalPathPoints = pathPoints || []; // Start with state (most reliable)
+            
+            if (getAllPathPoints) {
+              try {
+                const allPathPoints = getAllPathPoints();
+                // Use getAllPathPoints if it has more points than state
+                if (allPathPoints && allPathPoints.length > finalPathPoints.length) {
+                  finalPathPoints = allPathPoints;
+                }
+              } catch (error) {
+                console.error('Erro ao obter todos os pathPoints:', error);
+                // Fallback to state pathPoints
+              }
+            }
+            
+            // Final safety check - ensure we have valid array
+            if (!finalPathPoints || !Array.isArray(finalPathPoints) || finalPathPoints.length === 0) {
+              finalPathPoints = pathPoints || [];
+            }
+            
+            // Ensure we have at least one pace data point if we have distance and time
+            let finalPaceData = paceData || [];
+            if (finalPaceData.length === 0 && time > 0 && distance > 0) {
+              // Calculate final pace point if none were collected
+              const finalPace = (time / 60) / distance; // minutes per km
+              if (finalPace > 0 && finalPace < 30) {
+                finalPaceData = [{
+                  time: time,
+                  distance: distance,
+                  pace: parseFloat(finalPace.toFixed(2)),
+                }];
+              }
+            }
+            
             const run = {
               id: Date.now().toString(),
               distanceInMeters: distanceInMeters,
               durationInMillis: time * 1000,
               timestamp: new Date().toISOString(),
-              pathPoints: pathPoints,
+              pathPoints: finalPathPoints,
               avgSpeedInKMH: time > 0 && distance > 0 
                 ? parseFloat((distance / (time / 3600)).toFixed(2)) 
                 : 0,
               caloriesBurned: calories.total,
+              paceData: finalPaceData,
             };
             await saveRun(run);
             resetRun();
@@ -222,7 +294,7 @@ export default function CurrentRunScreen() {
       </View>
 
       {/* Map Area - Reduced height to make room for controls */}
-      <View className={`mx-6 mb-4 rounded-3xl overflow-hidden ${isDark ? 'bg-gray-200' : 'bg-gray-100'}`} style={{ height: '55%' }}>
+      <View className={`mx-6 mb-4 rounded-3xl overflow-hidden ${isDark ? 'bg-gray-200' : 'bg-gray-100'}`} style={{ height: '50%' }}>
         <GoogleMapView 
           pathPoints={pathPoints} 
           isDark={isDark}
@@ -237,7 +309,7 @@ export default function CurrentRunScreen() {
       {/* Stats Card - Added safe area bottom padding */}
       <View 
         className={`mx-6 rounded-3xl p-6 border ${isDark ? 'bg-gray-200 border-gray-300/30' : 'bg-white border-gray-300'} shadow-lg`}
-        style={{ marginBottom: Math.max(insets.bottom, 16) }}>
+        style={{ marginBottom: Math.max(insets.bottom + 60, 80) }}>
         {/* Main Stats */}
         <View className="flex-row justify-around mb-4">
           <View className="items-center flex-1">

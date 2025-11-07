@@ -55,9 +55,9 @@
       [
         "expo-location",
         {
-          "locationAlwaysAndWhenInUsePermission": "Allow Running Well to use your location to track your runs.",
-          "locationAlwaysPermission": "Allow Running Well to use your location to track your runs in the background.",
-          "locationWhenInUsePermission": "Allow Running Well to use your location to track your runs."
+          "locationAlwaysAndWhenInUsePermission": "Permitir que o app rastreie sua corrida mesmo com a tela desligada.",
+          "locationAlwaysPermission": "Permitir que o app rastreie sua corrida mesmo com a tela desligada.",
+          "locationWhenInUsePermission": "Usamos sua localização para rastrear suas corridas."
         }
       ],
       [

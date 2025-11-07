@@ -1,9 +1,9 @@
 import { IconSymbol } from '@/components/ui/icon-symbol';
 import { useSettings } from '@/context/SettingsContext';
 import { useColorScheme } from '@/hooks/use-color-scheme';
+import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { ScrollView, Text, TouchableOpacity, View } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
 
 export default function ProfileScreen() {
   const colorScheme = useColorScheme();
@@ -67,6 +67,18 @@ export default function ProfileScreen() {
             </View>
             <Text className={`flex-1 text-base font-pregular ${isDark ? 'text-white' : 'text-black'}`}>
               Conquistas
+            </Text>
+            <IconSymbol name="chevron.right" size={20} color={isDark ? '#918F9A' : '#777680'} />
+          </TouchableOpacity>
+          
+          <TouchableOpacity 
+            className="flex-row items-center px-6 py-4 border-b border-gray-300/20"
+            onPress={() => router.push('/debug-logs')}>
+            <View className="w-10 h-10 rounded-full bg-primary/20 items-center justify-center mr-4">
+              <Ionicons name="bug-outline" size={20} color={isDark ? '#BFC2FF' : '#4C52BF'} />
+            </View>
+            <Text className={`flex-1 text-base font-pregular ${isDark ? 'text-white' : 'text-black'}`}>
+              Logs de Debug
             </Text>
             <IconSymbol name="chevron.right" size={20} color={isDark ? '#918F9A' : '#777680'} />
           </TouchableOpacity>
