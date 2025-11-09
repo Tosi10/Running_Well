@@ -88,8 +88,9 @@ export function GoogleMapView({ pathPoints = [], isDark = false, currentLocation
         // Check if animateToRegion method exists before calling
         if (typeof mapRef.current.animateToRegion === 'function') {
           mapRef.current.animateToRegion(newRegion, 300); // Smooth animation
-          lastUpdateTime.current = now;
         }
+        setRegion(newRegion);
+        lastUpdateTime.current = now;
       }
     }
   }, [currentLocation, mapReady, isTracking]);
